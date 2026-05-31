@@ -49,8 +49,11 @@ def drive_path_back(path, pose, speed):
 
 def drive_paths(idx, paths, pose, speed): # idx -- references path currently following 
     path = paths[idx]
-    
     if drive_path(path, pose, speed):
         idx += 1
 
     return idx
+
+def stop():
+    drive.drive(0)
+    drive.steering(0)

@@ -1,6 +1,20 @@
 import math
 
-OPEN_FIRST_PATH = [[300, 300], [300, 2400]]
+open_first_path = [[500, 300], [500, 2400]]
+
+cw_paths = [ 
+    [[300, 300], [300, 2350]],
+    [[300, 2700], [2350, 2700]],
+    [[2700, 2700], [2700, 650]],
+    [[2700, 300], [650, 300]]
+    ]
+
+ccw_paths = [ 
+    [[2700, 300], [2700, 2350]],
+    [[2700, 2700], [650, 2700]],
+    [[300, 2700], [300, 650]],
+    [[300, 300], [2350, 300]]
+]
 
 def augment_path(path):
     dx = path[1][0] - path[0][0]
@@ -23,5 +37,8 @@ def augment_paths(paths):
         paths[p] = augment_path(paths[p])
     return paths
 
-OPEN_FIRST_PATH = augment_path(OPEN_FIRST_PATH)
+open_first_path = augment_path(open_first_path)
+
+cw_paths = augment_paths(cw_paths)
+ccw_paths = augment_paths(ccw_paths)
 
