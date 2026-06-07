@@ -1,8 +1,9 @@
 import math
 
-from coind4 import extract_distance
+from coind4 import extract_distance_to_point
 
 first_wall_extended = False
+DIST_BUFFER = 200
 
 def get_x(devices):
     global first_wall_extended
@@ -35,6 +36,23 @@ def get_y(devices):
         # rear reading valid
         elif 1000 < rear_dist < 2000:
             return rear_dist
+        
+def obstacle_on_path(devices):
+    x = get_x(devices)
+    y = get_y(devices)
+    if y > 1500: # On the left
+        x += 2000
+    return [x, y, 90]
+
+def obstacle_in_parking(devices):
+    x = get_x(devices)
+    if x > 500: # CCW
+        x += 2000
+        y = 2000 - devices["lidar"].get_distance(0)
+    else: # CW
+        y = 1000 + devices["lidar"].get_distance(180)
+        
+    return [x, y, 90]
 
 def open(devices):
     global first_wall_extended
@@ -44,26 +62,23 @@ def open(devices):
 
 def confirm_pose(pose, sensor_readings):
     global first_wall_extended
-    angle_from_north = pose[2] - 90 
-    
-    left_angle_uncorrected = math.atan((pose[0] + 200)/(3000 - pose[1]))
-    right_angle_uncorrected = math.atan((800 - pose[0])/(3000 - pose[1])) # (1000 - x + 200) / (3000 - y)
+    left_dist = extract_distance_to_point(pose, [0, 2700])
+    right_dist = extract_distance_to_point(pose, [1000, 2700])
 
-    left_angle = left_angle_uncorrected - angle_from_north
-    right_angle = (360 - right_angle_uncorrected) - angle_from_north
-
-    left_dist = extract_distance(sensor_readings["lidar"], left_angle)
-    right_dist = extract_distance(sensor_readings["lidar"], right_angle)
-    
-    left_wall_dist = pose[0] / math.sin(left_angle_uncorrected)
-    right_wall_dist = (1000 - pose[0]) / math.sin(right_angle_uncorrected)
+    left_wall_dist = math.sqrt( (0 - pose[0]) ** 2 + (2700 - pose[1]) ** 2)  
+    right_wall_dist = math.sqrt( (1000 - pose[0]) ** 2 + (2700 - pose[1]) ** 2)  
 
     # Left side is empty space -- CCW
-    if left_dist > left_wall_dist and right_dist <= right_wall_dist: 
+    if left_dist > left_wall_dist + DIST_BUFFER and right_dist <= right_wall_dist + DIST_BUFFER: 
         if first_wall_extended:
             pose[0] += 2400
         else:
             pose[0] += 2000
+    # Invalid values
+    elif (left_dist > left_wall_dist + DIST_BUFFER and right_dist > right_wall_dist + DIST_BUFFER) \
+        or (left_dist <= left_wall_dist + DIST_BUFFER and right_dist <= right_wall_dist + DIST_BUFFER):
+        return None
+    
     return pose
 
 # Challenges
@@ -74,3 +89,4 @@ def confirm_pose(pose, sensor_readings):
 #   so it is unable to detect spikes on inner corners 
 #   - Defer decision: Assume it is on the left or right 
 #   - Move forward to determine if it is on the left or right
+

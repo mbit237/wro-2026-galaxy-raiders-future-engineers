@@ -12,24 +12,27 @@ from paths import open_first_path, cw_paths, ccw_paths
 
 USE_TELEMETRY = True
 SPEED = 250 
-QUARTER_SECTIONS = 16
+PATHS_LIMIT = 16
 
 devices = initialise_hardware.init()
+nav = navigation.Navigation(devices)
+        
+if USE_TELEMETRY:
+    telemetry_client.connect()
+
+print("wait for button")
+# display LED colour to show it is ready and the mode (obstacle or open)
+while True:
+    if devices["pi"].read(17) == 0:
+        time.sleep(0.5)
+        break 
+
 pose = initialise_pose.open(devices)
 
 # Check if first wall is extended 
 if pose[3]:
     open_first_path[0][0] = 300
     open_first_path[1][0] = 300
-        
-if USE_TELEMETRY:
-    telemetry_client.connect()
-
-print("wait for button")
-while True:
-    if devices["pi"].read(17) == 0:
-        time.sleep(0.5)
-        break 
 
 # First path
 odometry.reset_pose()
@@ -42,11 +45,12 @@ while True:
     else:
         pose = odometry_pose
 
-    if navigation.drive_path(open_first_path, pose, SPEED):
+    if nav.drive_path(open_first_path, pose, SPEED):
         if localised_pose:
             break
 
-pose = initialise_pose.confirm_pose(pose, sensor_readings)
+# Change it such that the while loop only breaks after the pose is confirmed
+pose = initialise_pose.confirm_pose(pose, sensor_readings) 
 paths = []
 if pose[0] < 1500:
     paths = cw_paths
@@ -54,7 +58,6 @@ else:
     paths = ccw_paths
 
 path_idx = 1 # skip first path
-path_quarter_sections = 0
 
 odometry.reset_pose()
 while True:
@@ -66,16 +69,11 @@ while True:
     else:
         pose = odometry_pose
     
-    idx = navigation.drive_paths(path_idx, paths, pose, SPEED)
-    # Next quarter section
-    if idx % 4 == 0: 
-        idx = 0 
-        path_quarter_sections += 1
-    # Went past last quarter section
-    if path_quarter_sections >= (QUARTER_SECTIONS - 1):
+    path_changed, path_idx = nav.drive_paths(path_idx, paths, pose, SPEED)
+    if path_idx >= PATHS_LIMIT:
         break
 
-navigation.stop()
+nav.stop()
 
     
 

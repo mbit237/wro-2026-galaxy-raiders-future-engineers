@@ -1,5 +1,8 @@
 import serial 
 import struct
+import math
+
+from utilities import *
 
 CMD_HEADER = b'\xAA\x55'
 DATA_HEADER = b'\xAA\x55'
@@ -145,6 +148,12 @@ class CoinD4: # standard convention to start classes with uppercase
                 extract_distance(self.measurements, dir)
 
 def extract_distance(measurements, dir):
+    # 0 is straight ahead
     for m in measurements:
         if dir+1 > m[0] > dir-1:
             return m[1]
+
+def extract_distance_to_point(pose, point, measurements):
+    return extract_distance(measurements, dir_to_point(pose, point))
+    
+
