@@ -29,10 +29,11 @@ def augment_wall(wall):
     unit_path_vec = [path_vec[0] / dist, path_vec[1] / dist]
     p_unit_path_vec = [-1 * unit_path_vec[1], unit_path_vec[0]] 
     
-    wall.append(path_vec)
-    wall.append(path_dir)
-    wall.append(unit_path_vec)
-    wall.append(p_unit_path_vec)
+    wall.append(path_vec) # 2
+    wall.append(path_dir) # 3
+    wall.append(unit_path_vec) # 4 
+    wall.append(p_unit_path_vec) # 5
+    wall.append(dist) # 6
     return wall 
 
 def augment_walls(walls):
@@ -57,8 +58,8 @@ def add_cartesian(pose, lidar_readings):# lidar_readings in cartesian coordinate
     return c_lidar_readings
 
 def calc_pose(Tx, Ty, theta, odometry_pose):
-    new_x = odometry_pose[0] + Tx[0]
-    new_y = odometry_pose[1] + Ty[1]
+    new_x = odometry_pose[0] + Tx
+    new_y = odometry_pose[1] + Ty
     new_angle = odometry_pose[2] + theta
 
     return [new_x, new_y, new_angle]
@@ -71,6 +72,7 @@ def localise(odometry_pose, sensor_readings):
     matrix_B = []
     
     c_lidar_readings = add_cartesian(odometry_pose, sensor_readings["lidar"])
+
     for c_lidar_reading in c_lidar_readings:
         for wall in walls:
             x1 = c_lidar_reading[0]
@@ -78,16 +80,19 @@ def localise(odometry_pose, sensor_readings):
 
             lidar_reading_from_wall_start_vec = [c_lidar_reading[0] - wall[0][0], c_lidar_reading[1] - wall[0][1]]
             perpendicular_dist_from_wall = dot(wall[5], lidar_reading_from_wall_start_vec) # p_unit_vec * vec_start_from_lidar_point
+            distance_from_wall_start = dot(wall[4], lidar_reading_from_wall_start_vec)
 
             # Found match
-            if abs(perpendicular_dist_from_wall) <= PERPENDICULAR_DIST_THRESHOLD:
-                if wall[3] == 0 or wall[3] == 180: # wall direction vertical
+            if abs(perpendicular_dist_from_wall) <= PERPENDICULAR_DIST_THRESHOLD and 0 <= distance_from_wall_start <= wall[6]:
+                if wall[3] == 90 or wall[3] == 270: # wall direction vertical
                     matrix_A.append([-y1, 1, 0])
-                    matrix_B.append([perpendicular_dist_from_wall])
+                    matrix_B.append([wall[0][0] - x1])
 
-                elif wall[3] == 90 or wall[3] == 270: # wall direction horizontal
+                elif wall[3] == 0 or wall[3] == 180: # wall direction horizontal
                     matrix_A.append([x1, 0, 1])
-                    matrix_B.append([perpendicular_dist_from_wall])
+                    matrix_B.append([wall[0][1] - y1])
+
+                break 
 
     matrix_A = np.matrix(matrix_A)
     matrix_B = np.matrix(matrix_B)
@@ -95,9 +100,18 @@ def localise(odometry_pose, sensor_readings):
     psuedoinverse_A = np.linalg.pinv(matrix_A)
     matrix_x = np.matmul(psuedoinverse_A, matrix_B)
     
-    Tx = matrix_x[0][0]
-    Ty = matrix_x[1][0]
-    theta = matrix_x[2][0] * 180 / (2 * math.pi)
+    Tx = float(matrix_x[1][0])
+    Ty = float(matrix_x[2][0])
+    theta = float(matrix_x[0][0] / math.pi * 180)
     point_cloud_pose = calc_pose(Tx, Ty, theta, odometry_pose)
 
     return point_cloud_pose
+
+def localise_iter(odometry_pose, sensor_readings, iter=2):
+    curr_iter = 0 
+    curr_init_pose = odometry_pose
+    while curr_iter < iter:
+        curr_init_pose = localise(curr_init_pose, sensor_readings)
+        curr_iter += 1
+    
+    return curr_init_pose 
