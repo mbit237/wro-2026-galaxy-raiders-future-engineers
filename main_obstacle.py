@@ -18,7 +18,7 @@ PATHS_LIMIT = 16
 
 devices = initialise_hardware.init()
 nav = navigation.Navigation(devices)
-cam = rpicam.Rpicam(devices)
+cam = rpicam.Rpicam()
         
 if USE_TELEMETRY:
     telemetry_client.connect()

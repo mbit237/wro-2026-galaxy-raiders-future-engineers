@@ -2,9 +2,9 @@ import cv2
 from picamera2 import Picamera2
 
 #green threshold
-g_low_H = 29
+g_low_H = 44
 g_high_H = 68
-g_low_S = 47
+g_low_S = 84
 g_high_S = 255
 g_low_V = 41
 g_high_V = 255
@@ -14,7 +14,7 @@ r_low_H = 112
 r_high_H = 138
 r_low_S = 90
 r_high_S = 255
-r_low_V = 114
+r_low_V = 93
 r_high_V = 255
 
 params = cv2.SimpleBlobDetector_Params()
@@ -37,8 +37,8 @@ picam2.start() # Change the number to select a different camera
 
 
 class Rpicam:
-    def __init__(self, devices):
-        self.pi = devices["pi"]
+    def __init__(self):
+        pass
 
     def detect_blob(self):
         frame = picam2.capture_array("main") # Grab one image frame from camera
@@ -81,6 +81,3 @@ class Rpicam:
                 return "g"
             else:
                 return "r"
-
-    def servo_to_dir(self, dir):
-        pass

@@ -12,9 +12,9 @@ class Encoder:
     # tick -- The number of microseconds since boot
     def step_count(self, gpio, level, tick):
         if self.pin6_level:
-            self.steps += 1
-        else:
             self.steps -= 1
+        else:
+            self.steps += 1
 
     def drive_dir(self, gpio, level, tick):
         if level == 1:

@@ -1,5 +1,5 @@
 STEER_MAX = 45
-CENTER = 45
+CENTER_US = 1425 #center microseconds
 
 #GPIO20, GPIO21
 
@@ -10,18 +10,18 @@ class Drive:
 
     def drive(self, speed): # 0-255
         if speed > 0:
-            self.pi.set_PWM_dutycycle(20, 255-speed)
+            self.pi.set_PWM_dutycycle(20, 255+speed)
             self.pi.set_PWM_dutycycle(21, 255)
         else:
             self.pi.set_PWM_dutycycle(20, 255)
-            self.pi.set_PWM_dutycycle(21, 255+speed)
+            self.pi.set_PWM_dutycycle(21, 255-speed)
 
     def steering(self, dir):
         if dir < -STEER_MAX:
             dir = -STEER_MAX
         elif dir > STEER_MAX:
             dir = STEER_MAX
-        pulse_duration = 1340 + (80 / 9) *(dir + CENTER) - 400
+        pulse_duration = CENTER_US + (375 / 45) * dir
         self.pi.set_servo_pulsewidth(23, pulse_duration)
 
     def steer_p(self, dir, curr_angle, speed):
