@@ -10,7 +10,7 @@ import complementary_filter
 import navigation
 from paths import open_first_path, cw_paths, ccw_paths
 
-USE_TELEMETRY = True
+USE_TELEMETRY = False
 SPEED = 250 
 PATHS_LIMIT = 16
 
@@ -34,7 +34,7 @@ if pose[3]:
     open_first_path[0][0] = 300
     open_first_path[1][0] = 300
 
-# First path
+# --------------- First path --------------- # 
 odometry.reset_pose()
 while True:
     sensor_readings = sensors.read()
@@ -49,7 +49,7 @@ while True:
         if localised_pose:
             break
 
-# Change it such that the while loop only breaks after the pose is confirmed
+# ----- Change it such that the while loop only breaks after the pose is confirmed ----- #
 pose = initialise_pose.confirm_pose(pose, sensor_readings) 
 paths = []
 if pose[0] < 1500:
@@ -59,9 +59,10 @@ else:
 
 path_idx = 1 # skip first path
 
+# --------------- Main Loop --------------- # 
 odometry.reset_pose()
 while True:
-    sensor_readings = sensors.read()
+    sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
     localised_pose = localisation.localise(odometry_pose, sensor_readings)
     if localised_pose: 
