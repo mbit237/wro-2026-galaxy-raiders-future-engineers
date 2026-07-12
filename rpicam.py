@@ -3,7 +3,7 @@ from picamera2 import Picamera2
 
 #green threshold
 g_low_H = 44
-g_high_H = 68
+g_high_H = 75
 g_low_S = 84
 g_high_S = 255
 g_low_V = 41
@@ -21,7 +21,7 @@ params = cv2.SimpleBlobDetector_Params()
 params.filterByColor = True
 params.blobColor = 255 # Detect white blobs. If set to 0, it'll detect black blobs.
 params.filterByArea = True
-params.minArea = 250
+params.minArea = 650
 params.maxArea = 100000
 params.filterByCircularity = True
 params.minCircularity = 0.1
@@ -45,7 +45,7 @@ class Rpicam:
         if frame is None:
             return None
 
-        frame = frame[63:-80,0:-1]
+        frame = frame[105:-1,0:-1] # y, x
         frame = cv2.GaussianBlur(frame, (5,5), 0)
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
         g_frame = cv2.inRange(hsv_frame, (g_low_H, g_low_S, g_low_V), (g_high_H, g_high_S, g_high_V))
