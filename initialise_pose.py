@@ -62,11 +62,21 @@ def open(devices):
 
 def confirm_pose(pose, sensor_readings):
     global first_wall_extended
-    left_dist = extract_distance_to_point(pose, [0, 2700])
-    right_dist = extract_distance_to_point(pose, [1000, 2700])
+
+    left_dist = None
+    right_dist = None
+
+    while left_dist is None and right_dist is None:
+        left_dist = extract_distance_to_point(pose, [0, 2700], sensor_readings["lidar"])
+        right_dist = extract_distance_to_point(pose, [1000, 2700], sensor_readings["lidar"])
+        print("Left_dist: ", left_dist)
+        print("Right dist: ", right_dist)
 
     left_wall_dist = math.sqrt( (0 - pose[0]) ** 2 + (2700 - pose[1]) ** 2)  
     right_wall_dist = math.sqrt( (1000 - pose[0]) ** 2 + (2700 - pose[1]) ** 2)  
+
+    print("Left dist wall: ", left_wall_dist)
+    print("Right dist wall: ", right_wall_dist)
 
     # Left side is empty space -- CCW
     if left_dist > left_wall_dist + DIST_BUFFER and right_dist <= right_wall_dist + DIST_BUFFER: 
@@ -80,6 +90,8 @@ def confirm_pose(pose, sensor_readings):
         return None
     
     return pose
+
+    # If none of the conditions are satisfied, rerun the extract distances
 
 # Challenges
 # - Fwd and back dist were invalid because they were too far away 
