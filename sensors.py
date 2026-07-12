@@ -7,5 +7,5 @@ def read(devices):
     return {
         "gyro": devices["gyro"].delta_z(),
         "lidar": lidar_measurements,
-        "encoder": devices["encoder"].steps()
+        "encoder": devices["encoder"].steps
     }
