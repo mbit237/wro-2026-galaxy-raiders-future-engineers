@@ -100,9 +100,9 @@ def localise(odometry_pose, sensor_readings):
     psuedoinverse_A = np.linalg.pinv(matrix_A)
     matrix_x = np.matmul(psuedoinverse_A, matrix_B)
     
-    Tx = float(matrix_x[1][0])
-    Ty = float(matrix_x[2][0])
-    theta = float(matrix_x[0][0] / math.pi * 180)
+    Tx = float(matrix_x[1, 0])
+    Ty = float(matrix_x[2, 0])
+    theta = float(matrix_x[0, 0] / math.pi * 180)
     point_cloud_pose = calc_pose(Tx, Ty, theta, odometry_pose)
 
     return point_cloud_pose
