@@ -10,11 +10,11 @@ class Drive:
 
     def drive(self, speed): # 0-255
         if speed > 0:
-            self.pi.set_PWM_dutycycle(20, 255+speed)
-            self.pi.set_PWM_dutycycle(21, 255)
-        else:
-            self.pi.set_PWM_dutycycle(20, 255)
             self.pi.set_PWM_dutycycle(21, 255-speed)
+            self.pi.set_PWM_dutycycle(20, 255)
+        else:
+            self.pi.set_PWM_dutycycle(21, 255)
+            self.pi.set_PWM_dutycycle(20, 255+speed)
 
     def steering(self, dir):
         if dir < -STEER_MAX:

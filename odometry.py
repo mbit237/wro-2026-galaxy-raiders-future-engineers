@@ -1,7 +1,7 @@
 import time
 import math
 
-MM_PER_STEPS = 0.296 # Need to update
+MM_PER_STEPS = 0.475 
 LIDAR_WHEEL_DIST = 109
 
 prev_steps_count = 0 
