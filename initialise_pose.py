@@ -66,17 +66,20 @@ def confirm_pose(pose, sensor_readings):
     left_dist = None
     right_dist = None
 
-    while left_dist is None or right_dist is None:
-        left_dist = extract_distance_to_point(pose, [0, 2700], sensor_readings["lidar"])
-        right_dist = extract_distance_to_point(pose, [1000, 2700], sensor_readings["lidar"])
-        print("Left_dist: ", left_dist)
-        print("Right dist: ", right_dist)
+    
+    left_dist = extract_distance_to_point(pose, [0, 2700], sensor_readings["lidar"])
+    right_dist = extract_distance_to_point(pose, [1000, 2700], sensor_readings["lidar"])
+    print("Left_dist: ", left_dist)
+    print("Right dist: ", right_dist)
 
-    left_wall_dist = math.sqrt( (0 - pose[0]) ** 2 + (2700 - pose[1]) ** 2)  
-    right_wall_dist = math.sqrt( (1000 - pose[0]) ** 2 + (2700 - pose[1]) ** 2)  
+    if left_dist is None or right_dist is None:
+        return None
 
-    print("Left dist wall: ", left_wall_dist)
-    print("Right dist wall: ", right_wall_dist)
+    left_wall_dist = math.sqrt( (0 - pose[0]) ** 2 + (2700 - pose[1]) ** 2)
+    right_wall_dist = math.sqrt( (1000 - pose[0]) ** 2 + (2700 - pose[1]) ** 2)
+
+    print("Supposed left dist wall: ", left_wall_dist)
+    print("Supposed right dist wall: ", right_wall_dist)
 
     # Left side is empty space -- CCW
     if left_dist > left_wall_dist + DIST_BUFFER and right_dist <= right_wall_dist + DIST_BUFFER: 
@@ -87,7 +90,7 @@ def confirm_pose(pose, sensor_readings):
     # Invalid values
     elif (left_dist > left_wall_dist + DIST_BUFFER and right_dist > right_wall_dist + DIST_BUFFER) \
         or (left_dist <= left_wall_dist + DIST_BUFFER and right_dist <= right_wall_dist + DIST_BUFFER):
-        pass
+        return None
     
     return pose
 

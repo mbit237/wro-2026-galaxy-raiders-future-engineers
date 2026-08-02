@@ -157,6 +157,9 @@ def extract_distance(measurements, dir):
             return m[1]
 
 def extract_distance_to_point(pose, point, measurements):
-    return extract_distance(measurements, dir_to_point(pose, point))
+    direction = dir_to_point(pose, point)
+    if direction < 0:
+        direction += 360
+    return extract_distance(measurements, direction)
     
 

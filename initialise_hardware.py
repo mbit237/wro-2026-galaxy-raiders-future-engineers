@@ -6,6 +6,8 @@ import drive
 import camera_servo
 import led
 
+BUTTON_PIN = 17 
+
 def init():
     gyro_device = gyro.Gyro()
     gyro_device.load_calibration()
@@ -18,6 +20,12 @@ def init():
     drive_device = drive.Drive(pi)
     camera_servo_device = camera_servo.CameraServo(pi)
     led_device = led.LED(pi)
+
+    # Set pin 17 as input   
+    pi.set_mode(BUTTON_PIN, pigpio.INPUT)
+
+    # Optional: Set pull-up resistor for cleaner input
+    pi.set_pull_up_down(BUTTON_PIN, pigpio.PUD_UP)
     
     return {
         "gyro": gyro_device,

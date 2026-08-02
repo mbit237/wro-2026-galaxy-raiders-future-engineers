@@ -20,15 +20,13 @@ STOPPING_BOTTOM_POS = 1300
 
 devices = initialise_hardware.init()
 nav = navigation.Navigation(devices)
-led = led.LED()
 
 if USE_TELEMETRY:
     telemetry_client.connect()
 
-
-led.red_off()
+devices['led'].all_off()
 time.sleep(1)
-led.red_on()
+devices['led'].red_on()
 print("wait for button")
 # # display LED colour to show it is ready and the mode (obstacle or open)
 while True:
@@ -36,11 +34,12 @@ while True:
         time.sleep(0.5)
         break 
 
-pose = initialise_pose.open(devices)
-print(pose)
+devices['led'].red_off()
 
-led.red_off()
-led.green_on()
+pose = initialise_pose.open(devices)
+print('initial pose:', pose)
+
+devices['led'].green_on()
 
 # Check if first wall is extended 
 if pose[3]:
@@ -65,11 +64,22 @@ while True:
 
     print(pose)
     if nav.drive_path(open_first_path, pose, SPEED):
-        if localised_pose:
-            break
+        break
 
 # ----- Change it such that the while loop only breaks after the pose is confirmed ----- #
-pose = initialise_pose.confirm_pose(pose, sensor_readings) 
+print("Checking position")
+while True:
+    sensor_readings = sensors.read(devices)
+    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    localised_pose = localisation.localise(odometry_pose, sensor_readings)
+    if localised_pose: 
+        print(pose)
+        tmp_pose = initialise_pose.confirm_pose(pose, sensor_readings)
+        if tmp_pose != None:
+            pose = tmp_pose
+            break
+    pose = odometry_pose
+
 
 paths = []
 if pose[0] < 1500:

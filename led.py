@@ -24,3 +24,8 @@ class LED:
 
     def yellow_off(self):
         self.pi.write(26, 0)
+        
+    def all_off(self):
+        self.red_off()
+        self.green_off()
+        self.yellow_off()

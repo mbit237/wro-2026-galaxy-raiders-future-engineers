@@ -9,6 +9,7 @@ import spike_localisation as localisation
 import complementary_filter
 import navigation
 import rpicam
+import led
 from utilities import * 
 from paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path
 from obstacles import cw_obstacle_positions
@@ -24,15 +25,22 @@ cam = rpicam.Rpicam()
 if USE_TELEMETRY:
     telemetry_client.connect()
 
-# print("wait for button")
+devices['led'].all_off()
+time.sleep(1)
+devices['led'].yellow_on()
+print("wait for button")
 # display LED colour to show it is ready and the mode (obstacle or open)
-# while True:
-#     if devices["pi"].read(17) == 0:
-#         time.sleep(0.5)
-#         break 
+while True:
+    if devices["pi"].read(17) == 0:
+        time.sleep(0.5)
+        break 
+
+devices['led'].yellow_off()
 
 pose = initialise_pose.obstacle_on_path(devices)
-print(pose)
+print('initial pose =', pose)
+
+devices['led'].green_on()
 
 if pose[0] < 1500:
     red_paths = cw_obstacle_inner_paths
