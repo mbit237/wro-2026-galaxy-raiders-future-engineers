@@ -6,6 +6,8 @@ def dir_to_point(pose, point):
     angle = angle_uncorrected - pose[2]
     while angle < 0:
         angle += 360
+    while angle > 180:
+        angle -= 360
     return angle
 
 def dot(v1, v2):
