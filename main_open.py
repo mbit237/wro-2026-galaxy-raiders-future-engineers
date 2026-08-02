@@ -8,6 +8,7 @@ import odometry
 import spike_localisation as localisation
 import complementary_filter
 import navigation
+import led
 from paths import open_first_path, cw_paths, ccw_paths
 
 USE_TELEMETRY = False
@@ -19,19 +20,27 @@ STOPPING_BOTTOM_POS = 1300
 
 devices = initialise_hardware.init()
 nav = navigation.Navigation(devices)
-        
+led = led.LED()
+
 if USE_TELEMETRY:
     telemetry_client.connect()
 
-# print("wait for button")
+
+led.red_off()
+time.sleep(1)
+led.red_on()
+print("wait for button")
 # # display LED colour to show it is ready and the mode (obstacle or open)
-# while True:
-#     if devices["pi"].read(17) == 0:
-#         time.sleep(0.5)
-#         break 
+while True:
+    if devices["pi"].read(17) == 0:
+        time.sleep(0.5)
+        break 
 
 pose = initialise_pose.open(devices)
 print(pose)
+
+led.red_off()
+led.green_on()
 
 # Check if first wall is extended 
 if pose[3]:
