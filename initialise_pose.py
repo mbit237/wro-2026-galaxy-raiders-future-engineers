@@ -10,7 +10,7 @@ def get_x(devices):
     while True:
         left_dist = devices["lidar"].get_distance(90)
         right_dist = devices["lidar"].get_distance(270)
-        
+        print('initial_dist (left, right): ', left_dist, right_dist)
         # Wall extended
         if 500 < left_dist + right_dist < 700: 
             first_wall_extended = True

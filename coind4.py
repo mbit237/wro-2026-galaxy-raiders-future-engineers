@@ -65,6 +65,10 @@ class CoinD4: # standard convention to start classes with uppercase
                             return self._parse_frame()
         return False
 
+    def flush(self):
+        while self.update() is False:
+            pass
+
     def _send_cmd(self, code):
         cmd = bytearray(4)
         cmd[0:2] = CMD_HEADER

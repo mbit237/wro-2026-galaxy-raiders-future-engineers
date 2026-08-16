@@ -5,7 +5,7 @@ import initialise_pose
 import telemetry_client
 import sensors
 import odometry
-import spike_localisation as localisation
+import point_cloud_localisation as localisation
 import complementary_filter
 import navigation
 import led
@@ -36,9 +36,9 @@ while True:
 
 devices['led'].red_off()
 
+devices['lidar'].flush()
 pose = initialise_pose.open(devices)
 print('initial pose:', pose)
-
 devices['led'].green_on()
 
 # Check if first wall is extended 
@@ -59,10 +59,11 @@ while True:
     localised_pose = localisation.localise(odometry_pose, sensor_readings)
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
+        print(pose)
     else:
         pose = odometry_pose
 
-    print(pose)
+#    print(pose)
     if nav.drive_path(open_first_path, pose, SPEED):
         break
 
@@ -101,7 +102,6 @@ while True:
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
         print('Localised pose: ', pose)
-        
     else:
         pose = odometry_pose
         

@@ -16,7 +16,7 @@ from obstacles import cw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
-PATHS_LIMIT = 3
+PATHS_LIMIT = 37
 
 devices = initialise_hardware.init()
 nav = navigation.Navigation(devices)
@@ -80,8 +80,8 @@ else:
 path_idx = 0 
 paths = red_paths
 
-obstacle_position = cw_obstacle_positions[path_idx]
-print("obstalce_position: ", obstacle_position)
+obstacle_position = cw_obstacle_positions[path_idx] # put in checking direction if condition
+print("obstacle_position: ", obstacle_position)
 dir_to_obstacle = dir_to_point(pose, obstacle_position)
 print("dir_to_obstacle: ", dir_to_obstacle)
 devices["camera_servo"].set_dir(dir_to_obstacle)
@@ -102,6 +102,7 @@ while True:
     localised_pose = localisation.localise(odometry_pose, sensor_readings)
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
+        print("pose: ", pose)
     else:
         pose = odometry_pose
     

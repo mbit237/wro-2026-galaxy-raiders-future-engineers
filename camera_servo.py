@@ -1,4 +1,4 @@
-STEER_MAX = 89
+STEER_MAX = 87
 CENTER_US = 1475 #center microseconds
 
 #GPIO20, GPIO21

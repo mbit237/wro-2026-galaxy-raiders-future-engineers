@@ -72,6 +72,7 @@ def localise(odometry_pose, sensor_readings):
     matrix_B = []
     
     c_lidar_readings = add_cartesian(odometry_pose, sensor_readings["lidar"])
+    # print("cartesian_lidar: ", c_lidar_readings)
 
     for c_lidar_reading in c_lidar_readings:
         for wall in walls:
@@ -94,16 +95,26 @@ def localise(odometry_pose, sensor_readings):
 
                 break 
 
+
+    # print('matrix_A: ', matrix_A)
+    # print('matrix_B: ', matrix_B)
+
+    if len(matrix_A) < 4:
+        return None
+    
     matrix_A = np.matrix(matrix_A)
     matrix_B = np.matrix(matrix_B)
 
     psuedoinverse_A = np.linalg.pinv(matrix_A)
     matrix_x = np.matmul(psuedoinverse_A, matrix_B)
-    
+
+    # print('x', matrix_x)
+
     Tx = float(matrix_x[1, 0])
     Ty = float(matrix_x[2, 0])
     theta = float(matrix_x[0, 0] / math.pi * 180)
     point_cloud_pose = calc_pose(Tx, Ty, theta, odometry_pose)
+    # print('point cloud', point_cloud_pose)
 
     return point_cloud_pose
 
