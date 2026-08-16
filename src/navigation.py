@@ -1,5 +1,5 @@
 import math
-from src.utilities import dot
+from utilities import dot
 
 PATH_GAIN = -0.2
 MAX_ANGLE = 30
@@ -14,16 +14,21 @@ class Navigation:
         
         err = dot(path[5], robot_vec) # how far off the robot is (in mm)
         corr = err * PATH_GAIN 
+
+        print("path: ", path)
+        print("err, corr: ", err, corr)
         # Limit correction
         if corr > MAX_ANGLE:
             corr = MAX_ANGLE
         elif corr < -MAX_ANGLE:
             corr = -MAX_ANGLE
-        
+
         target_dir += corr 
         self.drive.steer_p(target_dir, pose[2], speed)
         robot_vec = [pose[0] - path[0][0], pose[1] - path[0][1]]
         dist_travelled_along_path = dot(path[4], robot_vec)
+
+        print("target, corr directions: ", target_dir, corr)
         
         if dist_travelled_along_path >= path[2]:
             return True

@@ -1,4 +1,4 @@
-import src.rpicam as rpicam
+import rpicam as rpicam
 
 cam = rpicam.Rpicam()
 

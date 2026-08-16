@@ -1,15 +1,15 @@
 import time
 
-import src.initialise_hardware as initialise_hardware
-import src.initialise_pose as initialise_pose
-import src.telemetry_client as telemetry_client
-import src.sensors as sensors
-import src.odometry as odometry
-import src.point_cloud_localisation as localisation
-import src.complementary_filter as complementary_filter
-import src.navigation as navigation
-import src.led as led
-from src.paths import open_first_path, cw_paths, ccw_paths
+import initialise_hardware as initialise_hardware
+import initialise_pose as initialise_pose
+import telemetry_client as telemetry_client
+import sensors as sensors
+import odometry as odometry
+import point_cloud_localisation as localisation
+import complementary_filter as complementary_filter
+import navigation as navigation
+import led as led
+from paths import open_first_path, cw_paths, ccw_paths
 
 USE_TELEMETRY = False
 SPEED = 250 

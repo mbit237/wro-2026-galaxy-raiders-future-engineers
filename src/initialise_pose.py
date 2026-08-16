@@ -1,6 +1,6 @@
 import math
 
-from src.coind4 import extract_distance_to_point
+from coind4 import extract_distance_to_point
 
 first_wall_extended = False
 DIST_BUFFER = 200

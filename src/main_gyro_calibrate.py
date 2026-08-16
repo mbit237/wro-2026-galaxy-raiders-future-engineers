@@ -1,4 +1,4 @@
-import src.gyro as gyro 
+import gyro as gyro 
 
 gyro_device = gyro.Gyro()
 print(f"z_error: {gyro_device.calibration()}")

@@ -2,7 +2,7 @@ import serial
 import struct
 import math
 
-from src.utilities import *
+from utilities import *
 
 CMD_HEADER = b'\xAA\x55'
 DATA_HEADER = b'\xAA\x55'
@@ -162,8 +162,10 @@ def extract_distance(measurements, dir):
 
 def extract_distance_to_point(pose, point, measurements):
     direction = dir_to_point(pose, point)
-    if direction < 0:
+    while direction < 0:
         direction += 360
+    while direction > 360:
+        direction -= 360
     return extract_distance(measurements, direction)
     
 

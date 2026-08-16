@@ -1,18 +1,18 @@
 import time
 
-import src.initialise_hardware as initialise_hardware
-import src.initialise_pose as initialise_pose
-import src.telemetry_client as telemetry_client
-import src.sensors as sensors
-import src.odometry as odometry
-import src.spike_localisation as localisation
-import src.complementary_filter as complementary_filter
-import src.navigation as navigation
-import src.rpicam as rpicam
-import src.led as led
-from src.utilities import * 
-from src.paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path
-from src.obstacles import cw_obstacle_positions
+import initialise_hardware as initialise_hardware
+import initialise_pose as initialise_pose
+import telemetry_client as telemetry_client
+import sensors as sensors
+import odometry as odometry
+import spike_localisation as localisation
+import complementary_filter as complementary_filter
+import navigation as navigation
+import rpicam as rpicam
+import led as led
+from utilities import * 
+from paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path
+from obstacles import cw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
@@ -37,6 +37,7 @@ while True:
 
 devices['led'].yellow_off()
 
+devices['lidar'].flush()
 pose = initialise_pose.obstacle_on_path(devices)
 print('initial pose =', pose)
 
@@ -96,13 +97,15 @@ elif color == "g":
 
 # Main Loop
 odometry.reset_pose()
+print_period = 0.5
+next_print = time.time() + print_period
 while True:
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
     localised_pose = localisation.localise(odometry_pose, sensor_readings)
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
-        print("pose: ", pose)
+        print("localised pose: ", pose)
     else:
         pose = odometry_pose
     
@@ -111,17 +114,29 @@ while True:
         break
     
     # Aim servo at obstacles
-    obstacle_position = cw_obstacle_positions[path_idx]
+    obstacle_position = cw_obstacle_positions[path_idx % len(cw_obstacle_positions)]
     dir_to_obstacle = dir_to_point(pose, obstacle_position)
     devices["camera_servo"].set_dir(dir_to_obstacle)
     color = cam.detect_blob() # always have updated image
     # infinite impulse response filter (running average) or finite impulse response filter (recent average)
     
+    # debugging prints
+    now = time.time()
+    if now >= next_print:
+        next_print += print_period
+        print('pose', pose)
+        print('dir to obs', dir_to_obstacle)
+        print('color', color)
+
     if path_changed:
         if color == "r":
+            print('path changed r', path_idx)
             paths = red_paths
         elif color == "g":
+            print('path changed g', path_idx)
             paths = green_paths
+        else:
+            print('path changed n', path_idx)
 
 nav.stop()
 
