@@ -1,5 +1,5 @@
 import math
-from utilities import dot
+from src.utilities import dot
 
 PATH_GAIN = -0.2
 MAX_ANGLE = 30

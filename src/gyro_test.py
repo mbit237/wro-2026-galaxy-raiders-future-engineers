@@ -1,4 +1,4 @@
-import initialise_hardware
+import src.initialise_hardware as initialise_hardware
 import time
 
 devices = initialise_hardware.init()

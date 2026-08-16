@@ -2,7 +2,7 @@ import serial
 import struct
 import math
 
-from utilities import *
+from src.utilities import *
 
 CMD_HEADER = b'\xAA\x55'
 DATA_HEADER = b'\xAA\x55'

@@ -1,10 +1,10 @@
-import gyro 
-import coind4
+import src.gyro as gyro 
+import src.coind4 as coind4
 import pigpio
-import encoder
-import drive
-import camera_servo
-import led
+import src.encoder as encoder
+import src.drive as drive
+import src.camera_servo as camera_servo
+import src.led as led
 
 BUTTON_PIN = 17 
 

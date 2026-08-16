@@ -1,7 +1,7 @@
 import math 
 import numpy as np
 
-from utilities import dot
+from src.utilities import dot
 
 PERPENDICULAR_DIST_THRESHOLD = 100
 

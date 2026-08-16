@@ -1,18 +1,18 @@
 import time
 
-import initialise_hardware
-import initialise_pose
-import telemetry_client
-import sensors
-import odometry
-import spike_localisation as localisation
-import complementary_filter
-import navigation
-import rpicam
-import led
-from utilities import * 
-from paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path
-from obstacles import cw_obstacle_positions
+import src.initialise_hardware as initialise_hardware
+import src.initialise_pose as initialise_pose
+import src.telemetry_client as telemetry_client
+import src.sensors as sensors
+import src.odometry as odometry
+import src.spike_localisation as localisation
+import src.complementary_filter as complementary_filter
+import src.navigation as navigation
+import src.rpicam as rpicam
+import src.led as led
+from src.utilities import * 
+from src.paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path
+from src.obstacles import cw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
