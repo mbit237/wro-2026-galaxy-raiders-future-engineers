@@ -125,7 +125,7 @@ Initially, we used the smbus library, but realised it was too slow and caused si
 
 ### I/O Interface (Button, LEDs)
 
-### Compass (unused) - 
+### Compass (unused) 
 
 ## Localisation 
 
@@ -250,7 +250,7 @@ Now that we have the transformation matrix, we need to identify which point on t
 
 ![dist_from_path](software-diagrams/dist_from_wall.png)
 
-$ dist = \hat{v} \cdot l $, in which $l$, is the vector of the lidar reading from the start of the wall. If it is a vertical wall, we only solve for the x-value and vice versa for a horizontal wall. 
+$dist = \hat{v} \cdot l$, in which $l$, is the vector of the lidar reading from the start of the wall. If it is a vertical wall, we only solve for the x-value and vice versa for a horizontal wall. 
 
 **localise_iter():**
 Since we are dealing with an overdetermined system, there is no exact solution, but only a rough estimate. Running it with more iterations will help minimise the errors. 
@@ -259,8 +259,18 @@ We tested it with a set of fake data which started with the mini-sets contain th
 
 ## Pathfinding 
 
+![pathfinding](software-diagrams/pathfinding.png)
+
+- drive_path(), drive_paths(): 
+	- Find the error by taking the dot product of the unit vector perpendicular to the path and the vector from the start of the path to the robot (robot_vector): perpendicular displacement $= \hat{u} \cdot \vec{r} $
+	- Get the correction / perpendicular distance of the robot from the path by multiplying the error by a gain
+	- Add the target_dir of the path with the correction which is what the robot will steer towards 
+	- Keep checking the dist_travelled_along_path if it reaches the end by taking the dot product of the unit_path_vector and the robot vector: displacement along path $= \hat{p} \cdot \vec{r} $
+
+Thus, the robot is able to slowly adjust itself towards the path. 
+
 ## Camera Tracking 
 
-## Obstacle Strategy 
+## Debugging / Telemetry tools 
 
 
