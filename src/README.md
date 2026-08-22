@@ -76,6 +76,16 @@ This allows for lower switching losses because fewer transistors switch simultan
 
 ### Camera - Raspberry Pi Camera Module v2
 
+We use the Raspberry Pi Camera Module with the picamera2 library to identify the colour of the obstacle in front of the car.
+The colour detection works as follows:
+1. Remove the top 105 pixels from the image to prevent the camera from seeing over the wall, avoiding any false positives
+2. Apply a gaussian blur on the image to remove noise and small variations in the image
+3. Convert the image from BGR to HSV. HSV is more useful in this case as it separates the hue from the brightness of colours, making it more reliable under different lighting conditions
+4. Using cv2.inRange(), a binary mask is applied to the image, where the white parts of the image represent the areas that are within the tested thresholds for green and red obstacles.
+5. Run cv2.SimpleBlobDetector() on the binary masks. It rejects blobs that are smaller than 650 pixels to remove any noise
+
+For each colour, detect_blob() will only return the largest blob that it detects.
+
 ### Servos (Camera Swivel, Steering) - MG90
 
 To calibrate the servos, we tested with different values from 500 to 2500 microseconds (µs) to find the centre, maximum and minimum. 
