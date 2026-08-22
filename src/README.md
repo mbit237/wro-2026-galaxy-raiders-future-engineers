@@ -129,7 +129,7 @@ Afterwards, we integrate other localisation methods on top of using odometry, by
 
 Initially, we used the spike landmark method during the 2025 season of WRO, but we wanted to improve our localisation method so we have since shifted to the [Iterative Closest Point](#Iterative-Closest-Point) method. 
 
-Essentially, the method matches identifies which lidar readings are spikes or points of interest, in our case corners which are noticeably further away than the adjacent readings. Afterwards, we calculate if there is any difference between the supposed and actual cartesian coordinate of the landmark to find the error. 
+Essentially, the method identifies which lidar readings are spikes or points of interest, in our case corners which are noticeably further away than the adjacent readings. Afterwards, we calculate if there is any difference between the supposed and actual cartesian coordinate of the landmark to find the error. 
 
 - Defined 8 landmarks: 4 inner corners, 4 outer corners, marked as green circles
 ![future-engineers-playfield](software-diagrams/FutureEngineers_Playfield.png)
@@ -240,6 +240,10 @@ HEADING_FILTER_RATIO = 0.01
 Thus, the robot is able to slowly adjust itself towards the path. 
 
 ## Camera Tracking 
+
+- Plotted points along the playfield, in between every pair of squares, where the obstacle could be placed
+- Camera will track two points ahead of its current position
+- Reused an existing function (dir_to_point) to calculate the angle the servo needs to turn to the obstacle, but adjusting the range to -180 to 180, as the function is used for cases where the range is 0 to 360
 
 ### Open Strategy 
 
