@@ -5,7 +5,7 @@ import initialise_pose as initialise_pose
 import telemetry_client as telemetry_client
 import sensors as sensors
 import odometry as odometry
-import point_cloud_localisation as localisation
+import spike_localisation as localisation
 import complementary_filter as complementary_filter
 import navigation as navigation
 import led as led
