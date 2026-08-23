@@ -1,18 +1,27 @@
 cw_obstacle_positions = [
     [500, 2000],
     [1000, 2500],
+    [1000, 2500],
     [1500, 2500]
+]
+
+ccw_obstacle_positions = [
+    [2500, 2000],
+    [2000, 2500],
+    [1500, 2500],
+    [1000, 2500]
 ]
 
 def full_obstacles_from_one_section(obstacle_section):
     full_obstacles = obstacle_section
-    for a in range(3):
+    obstacle_len = len(cw_obstacle_positions)
+    for a in range(obstacle_len):
         p = obstacle_section[a]
         full_obstacles.append([p[1], 3000-p[0]])
-    for a in range(3):
+    for a in range(obstacle_len):
         p = obstacle_section[a]
         full_obstacles.append([3000-p[0], 3000-p[1]])
-    for a in range(3):
+    for a in range(obstacle_len):
         p = obstacle_section[a]
         full_obstacles.append([3000-p[1], p[0]])
     return full_obstacles

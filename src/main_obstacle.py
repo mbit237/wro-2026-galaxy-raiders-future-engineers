@@ -12,7 +12,7 @@ import rpicam as rpicam
 import led as led
 from utilities import * 
 from paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path
-from obstacles import cw_obstacle_positions
+from obstacles import cw_obstacle_positions, ccw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
@@ -47,10 +47,12 @@ if pose[0] < 1500:
     red_paths = cw_obstacle_inner_paths
     green_paths = cw_obstacle_outer_paths
     parking_path = cw_parking_path
+    obstacle_positions = cw_obstacle_positions
 else:
     green_paths = ccw_obstacle_inner_paths
     red_paths = ccw_obstacle_outer_paths
     parking_path = ccw_parking_path
+    obstacle_positions = ccw_obstacle_positions
 
 # Reverse if necessary 
 # L_dist = min(get_distance(ldr, 20), get_distance(ldr, 25), get_distance(ldr, 30), get_distance(ldr, 35), get_distance(ldr, 40), get_distance(ldr, 45))
@@ -81,7 +83,8 @@ else:
 path_idx = 0 
 paths = red_paths
 
-obstacle_position = cw_obstacle_positions[path_idx] # put in checking direction if condition
+obstacle_position = obstacle_positions[path_idx]
+
 print("obstacle_position: ", obstacle_position)
 dir_to_obstacle = dir_to_point(pose, obstacle_position)
 print("dir_to_obstacle: ", dir_to_obstacle)
@@ -100,6 +103,14 @@ odometry.reset_pose()
 print_period = 0.5
 next_print = time.time() + print_period
 while True:
+    # debugging prints
+    now = time.time()
+    if now >= next_print:
+        debug = True
+    else:
+        debug = False
+
+
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
     localised_pose = localisation.localise(odometry_pose, sensor_readings)
@@ -109,7 +120,7 @@ while True:
     else:
         pose = odometry_pose
     
-    path_changed, path_idx = nav.drive_paths(path_idx, paths, pose, SPEED)
+    path_changed, path_idx = nav.drive_paths(path_idx, paths, pose, SPEED, debug=debug)
     if path_idx >= PATHS_LIMIT:
         break
     
@@ -120,21 +131,21 @@ while True:
     color = cam.detect_blob() # always have updated image
     # infinite impulse response filter (running average) or finite impulse response filter (recent average)
     
-    # debugging prints
-    now = time.time()
-    if now >= next_print:
+    if debug:
         next_print += print_period
         print('pose', pose)
-        print('dir to obs', dir_to_obstacle)
+        print('dir to obs', dir_to_obstacle, obstacle_position)
         print('color', color)
 
     if path_changed:
         if color == "r":
             print('path changed r', path_idx)
             paths = red_paths
+            print('new path', paths[path_idx % len(paths)])
         elif color == "g":
             print('path changed g', path_idx)
             paths = green_paths
+            print('new path', paths[path_idx % len(paths)])
         else:
             print('path changed n', path_idx)
 
