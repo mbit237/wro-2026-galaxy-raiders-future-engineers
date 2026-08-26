@@ -58,8 +58,20 @@ def add_cartesian(pose, lidar_readings):# lidar_readings in cartesian coordinate
     return c_lidar_readings
 
 def calc_pose(Tx, Ty, theta, odometry_pose):
-    new_x = odometry_pose[0] + Tx
-    new_y = odometry_pose[1] + Ty
+    # Rotate odomoetry position about point 
+    r = math.sqrt(odometry_pose[0]**2 + odometry_pose[1]**2)
+
+    alpha = math.atan2(odometry_pose[1], odometry_pose[0])
+    rotation_angle = theta * (2*math.pi / 360) # convert from degrees to radians 
+    rotation_angle += alpha
+
+    new_x = r * math.cos(rotation_angle)
+    new_y = r * math.sin(rotation_angle)
+    
+    # Add Tx, Ty 
+
+    new_x += Tx
+    new_y += Ty
     new_angle = odometry_pose[2] + theta
 
     return [new_x, new_y, new_angle]
