@@ -25,13 +25,17 @@ outer_one_section = [
 
     [[250, 1500], [250, 2000]],
 
-    [[400, 2400], [750, 2600]]
+    [[250, 2000], [600, 2750]],
+
+    [[800, 2750], [1000, 2750]]
 ]
 
 inner_one_section = [
     [[750, 1000], [750, 1500]],
 
     [[750, 1500], [750, 2000]], 
+
+    [[750, 2100], [750, 2200]],
 
     [[750, 2250], [1000, 2250]]
 ]
@@ -149,5 +153,5 @@ ccw_obstacle_outer_paths = augment_paths(ccw_obstacle_outer_paths)
 ccw_obstacle_inner_paths = augment_paths(ccw_obstacle_inner_paths)
 ccw_parking_path = augment_path(ccw_parking_path)
 
-
+print(cw_obstacle_outer_paths)
 

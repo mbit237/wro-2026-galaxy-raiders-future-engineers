@@ -24,7 +24,7 @@ class Drive:
         pulse_duration = CENTER_US + (375 / 45) * dir
         self.pi.set_servo_pulsewidth(23, pulse_duration)
 
-    def steer_p(self, dir, curr_angle, speed):
+    def steer_p(self, dir, curr_angle, speed, debug=False):
         while curr_angle - dir > 180:
             curr_angle -= 360
         while curr_angle - dir < -180:
@@ -33,6 +33,8 @@ class Drive:
         error = curr_angle - dir
         gain = 2 
         correction = error * gain 
+        if debug:
+            print('steering', correction)
         self.steering(correction)
         self.drive(speed)
 

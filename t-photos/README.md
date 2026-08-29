@@ -1,0 +1,1 @@
+## This is the folder to the photos of our team. :)

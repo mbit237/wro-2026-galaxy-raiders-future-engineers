@@ -66,8 +66,9 @@ class CoinD4: # standard convention to start classes with uppercase
         return False
 
     def flush(self):
-        while self.update() is False:
+        while self.update():
             pass
+        self.measurements = []
 
     def _send_cmd(self, code):
         cmd = bytearray(4)
