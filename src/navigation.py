@@ -38,7 +38,7 @@ class Navigation:
         else:
             return False
 
-    def drive_path_back(self, path, pose, speed):
+    def drive_path_back(self, path, pose, speed, debug=False):
         target_dir = path[3] 
         robot_vec = [pose[0] - path[0][0], pose[1] - path[0][1]]
         
@@ -52,6 +52,11 @@ class Navigation:
             corr = -MAX_ANGLE
 
         target_dir -= corr 
+
+        if debug:
+            print("path: ", path)
+            print("err, corr, target: ", err, corr, target_dir)
+
         # print(f"Target direction: {target_dir}, gyro: {pose}")
         self.drive.steer_p_back(target_dir, pose[2], speed)
 

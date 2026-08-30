@@ -1,6 +1,28 @@
 import math
 
-open_first_path = [[500, 300], [500, 2400]]
+open_first_path = [
+    [500, 300], [500, 2400]
+]
+
+cw_obstacle_first_outer_paths = [
+    [[500, 1000], [500, 1210]],
+    [[0, 1000], [500, 1000]],
+    [[0, 1200], [300, 1200]],
+]
+
+cw_obstacle_first_inner_paths = [
+    [[500, 1000], [500, 1210]],
+    [[0, 1000], [500, 1000]],
+    [[0, 1200], [600, 1200]],
+]
+
+ccw_obstacle_first_outer_paths = [
+    [2900, 1750], [2600, 1850]
+]  # need to change
+ccw_obstacle_first_inner_paths = [
+    [2900, 1750], [2400, 1850]
+]
+
 
 # Open
 cw_paths = [ 
@@ -148,10 +170,14 @@ ccw_obstacle_outer_paths, ccw_obstacle_inner_paths = ccw_paths_from_cw(cw_obstac
 cw_obstacle_outer_paths = augment_paths(cw_obstacle_outer_paths)
 cw_obstacle_inner_paths = augment_paths(cw_obstacle_inner_paths)
 cw_parking_path = augment_path(cw_parking_path)
+cw_obstacle_first_inner_paths = augment_paths(cw_obstacle_first_inner_paths)
+cw_obstacle_first_outer_paths = augment_paths(cw_obstacle_first_outer_paths)
 
 ccw_obstacle_outer_paths = augment_paths(ccw_obstacle_outer_paths)
 ccw_obstacle_inner_paths = augment_paths(ccw_obstacle_inner_paths)
 ccw_parking_path = augment_path(ccw_parking_path)
+ccw_obstacle_first_inner_paths = augment_path(ccw_obstacle_first_inner_paths)
+ccw_obstacle_first_outer_paths = augment_path(ccw_obstacle_first_outer_paths)
 
 print(cw_obstacle_outer_paths)
 
