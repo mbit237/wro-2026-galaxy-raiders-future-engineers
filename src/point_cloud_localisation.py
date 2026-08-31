@@ -128,6 +128,9 @@ def localise(odometry_pose, sensor_readings):
     point_cloud_pose = calc_pose(Tx, Ty, theta, odometry_pose)
     # print('point cloud', point_cloud_pose)
 
+    if abs(point_cloud_pose[2] - odometry_pose[2]) > 9:
+        print(c_lidar_readings)
+
     return point_cloud_pose
 
 def localise_iter(odometry_pose, sensor_readings, iter=2):

@@ -1,5 +1,5 @@
 POSITION_FILTER_RATIO = 0.1 
-HEADING_FILTER_RATIO = 0.01 
+HEADING_FILTER_RATIO = 0.5
 
 def merge(odo_pose, localised_pose):
     odo_x = odo_pose[0]
