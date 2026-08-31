@@ -11,12 +11,12 @@ import navigation as navigation
 import rpicam as rpicam
 import led as led
 from utilities import * 
-from paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path
+from paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path, cw_obstacle_first_inner_paths, cw_obstacle_first_outer_paths, ccw_obstacle_first_inner_paths, ccw_obstacle_first_outer_paths
 from obstacles import cw_obstacle_positions, ccw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
-PATHS_LIMIT = 37
+PATHS_LIMIT = 3  # full run is 37
 
 devices = initialise_hardware.init()
 nav = navigation.Navigation(devices)
@@ -38,7 +38,8 @@ while True:
 devices['led'].yellow_off()
 
 devices['lidar'].flush()
-pose = initialise_pose.obstacle_on_path(devices)
+# pose = initialise_pose.obstacle_on_path(devices)
+pose = initialise_pose.obstacle_in_parking(devices)
 print('initial pose =', pose)
 
 devices['led'].green_on()
@@ -46,11 +47,15 @@ devices['led'].green_on()
 if pose[0] < 1500:
     red_paths = cw_obstacle_inner_paths
     green_paths = cw_obstacle_outer_paths
+    inner_starting_paths = cw_obstacle_first_inner_paths
+    outer_starting_paths = cw_obstacle_first_outer_paths
     parking_path = cw_parking_path
     obstacle_positions = cw_obstacle_positions
 else:
     green_paths = ccw_obstacle_inner_paths
     red_paths = ccw_obstacle_outer_paths
+    inner_starting_paths = ccw_obstacle_first_inner_paths
+    outer_starting_paths = ccw_obstacle_first_outer_paths
     parking_path = ccw_parking_path
     obstacle_positions = ccw_obstacle_positions
 
@@ -81,27 +86,92 @@ else:
 #             paths = obstacle_inner_paths
 
 path_idx = 0 
-paths = red_paths
+# obstacle_position = obstacle_positions[path_idx]
+# obstacle_position = obstacle_positions[-1]
 
-obstacle_position = obstacle_positions[path_idx]
-
-print("obstacle_position: ", obstacle_position)
-dir_to_obstacle = dir_to_point(pose, obstacle_position)
-print("dir_to_obstacle: ", dir_to_obstacle)
-devices["camera_servo"].set_dir(dir_to_obstacle)
-time.sleep(1)
-
-color = cam.detect_blob()
-print(color)
-if color == "r":
-    paths = red_paths
-elif color == "g":
-    paths = green_paths
+# print("obstacle_position: ", obstacle_position)
+# dir_to_obstacle = dir_to_point(pose, obstacle_position)
+# print("dir_to_obstacle: ", dir_to_obstacle)
+#devices["camera_servo"].set_dir(dir_to_obstacle)
+#time.sleep(1)
 
 # Main Loop
 odometry.reset_pose()
 print_period = 0.5
 next_print = time.time() + print_period
+
+# get out of parking: forward
+starting_paths = outer_starting_paths
+while True:
+    sensor_readings = sensors.read(devices)
+    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    pose = odometry_pose
+
+    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+    devices["camera_servo"].set_dir(dir_to_obstacle)
+
+    if nav.drive_path(starting_paths[0], pose, 200, debug=False):
+        break
+print('exit 1')
+
+# # get out of parking: back
+stop_time = time.time() + 0.35
+while True:
+    sensor_readings = sensors.read(devices)
+    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    pose = odometry_pose
+
+    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+    devices["camera_servo"].set_dir(dir_to_obstacle)
+
+#    print(pose)
+    nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
+    if time.time() > stop_time:
+        break
+print('exit 2')
+
+# # get out of parking: forward2
+while True:
+    sensor_readings = sensors.read(devices)
+    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    pose = odometry_pose
+
+    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+    devices["camera_servo"].set_dir(dir_to_obstacle)
+
+#    print(pose)
+    if nav.drive_path(starting_paths[2], pose, 200, debug=False):
+        break
+print('exit 3')
+
+print('obs', pose, obstacle_positions[-1])
+
+color = cam.detect_blob()
+print(color)
+if color == "r":
+    print("red")
+    starting_paths = inner_starting_paths
+    paths = red_paths
+elif color == "g":
+# else:
+    print("green")
+    starting_paths = outer_starting_paths
+    paths = green_paths
+
+# # get out of parking: forward3 (run a bit more if neccessary)
+while True:
+    sensor_readings = sensors.read(devices)
+    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    pose = odometry_pose
+
+    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+    devices["camera_servo"].set_dir(dir_to_obstacle)
+
+#    print(pose)
+    if nav.drive_path(starting_paths[2], pose, 200, debug=False):
+        break
+print('exit 4')
+
 while True:
     # debugging prints
     now = time.time()
@@ -125,7 +195,7 @@ while True:
         break
     
     # Aim servo at obstacles
-    obstacle_position = cw_obstacle_positions[path_idx % len(cw_obstacle_positions)]
+    obstacle_position = obstacle_positions[(path_idx) % len(obstacle_positions)]
     dir_to_obstacle = dir_to_point(pose, obstacle_position)
     devices["camera_servo"].set_dir(dir_to_obstacle)
     color = cam.detect_blob() # always have updated image
@@ -150,10 +220,3 @@ while True:
             print('path changed n', path_idx)
 
 nav.stop()
-
-    
-
-
-
-
-
