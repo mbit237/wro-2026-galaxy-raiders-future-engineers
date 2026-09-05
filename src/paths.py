@@ -165,6 +165,7 @@ ccw_paths = augment_paths(ccw_paths)
 
 # Obstacle
 cw_obstacle_outer_paths, cw_obstacle_inner_paths = full_path_from_one_section(outer_one_section, inner_one_section)
+cw_obstacle_outer_paths[0][0][0], cw_obstacle_outer_paths[0][1][0] = 400, 400
 ccw_obstacle_outer_paths, ccw_obstacle_inner_paths = ccw_paths_from_cw(cw_obstacle_outer_paths, cw_obstacle_inner_paths)
 
 cw_obstacle_outer_paths = augment_paths(cw_obstacle_outer_paths)
