@@ -16,7 +16,7 @@ curr_pose = [2500, 2500, 12]
 
 start_time = time.perf_counter()
 for x in range(1): 
-    point_cloud_pose_iter = localise_iter(curr_pose, sensor_readings, "open")
+    point_cloud_pose_iter = localise(curr_pose, sensor_readings, "open")
 
 print(f"actual pose: {actual_pose}, point_cloud_pose: {point_cloud_pose_iter}")
 end_time = time.perf_counter()

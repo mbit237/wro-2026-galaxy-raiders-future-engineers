@@ -13,12 +13,12 @@ from paths import open_first_path, cw_paths, ccw_paths
 
 USE_TELEMETRY = False
 SPEED = 250 
-PATHS_LIMIT = 12 
+PATHS_LIMIT = 4
 SEGMENT_DIVIDER = 1700
 STOPPING_TOP_POS = 1800
 STOPPING_BOTTOM_POS = 1300
 
-MODE = "open"
+MODE = "obstacle"
 
 devices = initialise_hardware.init()
 nav = navigation.Navigation(devices)
@@ -106,8 +106,8 @@ while True:
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
         print('Localised pose: ', pose)
-        if abs(localised_pose[2] - odometry_pose[2]) > 9:
-            break
+        # if abs(localised_pose[2] - odometry_pose[2]) > 9:
+        #     break
     else:
         pose = odometry_pose
         

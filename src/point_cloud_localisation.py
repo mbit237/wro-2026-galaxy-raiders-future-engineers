@@ -4,6 +4,7 @@ import numpy as np
 from utilities import dot
 
 PERPENDICULAR_DIST_THRESHOLD = 100
+MINIMUN_POINTS = 50
 
 open_walls = [
     # outer walls, clockwise dir
@@ -95,7 +96,7 @@ def calc_pose(Tx, Ty, theta, odometry_pose):
 
     return [new_x, new_y, new_angle]
 
-def localise(odometry_pose, sensor_readings, mode):
+def localise_once(odometry_pose, sensor_readings, mode):
     global obstacle_walls, open_walls
     if not sensor_readings["lidar"]:
         return False
@@ -155,7 +156,7 @@ def localise(odometry_pose, sensor_readings, mode):
     # print('matrix_A: ', matrix_A)
     # print('matrix_B: ', matrix_B)
 
-    if len(matrix_A) < 4:
+    if len(matrix_A) < MINIMUN_POINTS:
         return None
     
     matrix_A = np.matrix(matrix_A)
@@ -177,11 +178,13 @@ def localise(odometry_pose, sensor_readings, mode):
 
     return point_cloud_pose
 
-def localise_iter(odometry_pose, sensor_readings, mode, iter=2):
+def localise(odometry_pose, sensor_readings, mode, iter=2):
     curr_iter = 0 
     curr_init_pose = odometry_pose
     while curr_iter < iter:
-        curr_init_pose = localise(curr_init_pose, sensor_readings, mode)
+        curr_init_pose = localise_once(curr_init_pose, sensor_readings, mode)
+        if curr_init_pose is None:
+            break
         curr_iter += 1
     
     return curr_init_pose 
