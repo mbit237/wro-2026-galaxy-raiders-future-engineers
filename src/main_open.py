@@ -18,6 +18,8 @@ SEGMENT_DIVIDER = 1700
 STOPPING_TOP_POS = 1800
 STOPPING_BOTTOM_POS = 1300
 
+MODE = "open"
+
 devices = initialise_hardware.init()
 nav = navigation.Navigation(devices)
 
@@ -56,7 +58,7 @@ odometry.reset_pose()
 while True:
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    localised_pose = localisation.localise(odometry_pose, sensor_readings)
+    localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
         print(pose)
@@ -72,7 +74,7 @@ print("Checking position")
 while True:
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    localised_pose = localisation.localise(odometry_pose, sensor_readings)
+    localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
     if localised_pose: 
         print(pose)
         tmp_pose = initialise_pose.confirm_pose(pose, sensor_readings)
@@ -98,7 +100,7 @@ print('After first path: ', pose)
 while True:
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    localised_pose = localisation.localise(odometry_pose, sensor_readings)
+    localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
         print('Localised pose: ', pose)

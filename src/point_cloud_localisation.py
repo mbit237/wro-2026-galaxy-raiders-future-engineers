@@ -5,7 +5,7 @@ from utilities import dot
 
 PERPENDICULAR_DIST_THRESHOLD = 100
 
-walls = [
+open_walls = [
     # outer walls, clockwise dir
     [[0, 0], [0, 3000]], 
     [[0, 3000], [3000, 3000]], 
@@ -17,6 +17,24 @@ walls = [
     [[1000, 2000], [2000, 2000]], 
     [[2000, 2000], [2000, 1000]], 
     [[2000, 1000], [1000, 1000]]
+]
+
+obstacle_walls = [
+    # outer walls, clockwise dir
+    [[0, 0], [0, 3000]], 
+    [[0, 3000], [3000, 3000]], 
+    [[3000, 3000], [3000, 0]], 
+    [[3000, 0], [0, 0]], 
+
+    # inner walls, clockwise dir
+    [[1000, 1000], [1000, 2000]], 
+    [[1000, 2000], [2000, 2000]], 
+    [[2000, 2000], [2000, 1000]], 
+    [[2000, 1000], [1000, 1000]], 
+
+    # parking walls
+    [[0, 1000], [200, 1000]], 
+    [[0, 1277], [200, 1277]], # length robot - 18.5cm x 1.5 = 27.75
 ]
 
 def augment_wall(wall):
@@ -41,7 +59,8 @@ def augment_walls(walls):
         walls[w] = augment_wall(walls[w])
     return walls
 
-walls = augment_walls(walls)
+open_walls = augment_walls(open_walls)
+obstacle_walls = augment_walls(obstacle_walls)
 
 def add_cartesian(pose, lidar_readings):# lidar_readings in cartesian coordinates
     c_lidar_readings = []
@@ -76,9 +95,15 @@ def calc_pose(Tx, Ty, theta, odometry_pose):
 
     return [new_x, new_y, new_angle]
 
-def localise(odometry_pose, sensor_readings):
+def localise(odometry_pose, sensor_readings, mode):
+    global obstacle_walls, open_walls
     if not sensor_readings["lidar"]:
         return False
+
+    if mode == "obstacle":
+        walls = obstacle_walls
+    elif mode == "open":
+        walls = open_walls
     
     matrix_A = []
     matrix_B = []
@@ -87,6 +112,8 @@ def localise(odometry_pose, sensor_readings):
     # print("cartesian_lidar: ", c_lidar_readings)
 
     for c_lidar_reading in c_lidar_readings:
+        matched_walls = []
+
         for wall in walls:
             x1 = c_lidar_reading[0]
             y1 = c_lidar_reading[1]
@@ -95,18 +122,35 @@ def localise(odometry_pose, sensor_readings):
             perpendicular_dist_from_wall = dot(wall[5], lidar_reading_from_wall_start_vec) # p_unit_vec * vec_start_from_lidar_point
             distance_from_wall_start = dot(wall[4], lidar_reading_from_wall_start_vec)
 
-            # Found match
+            # Old - Found match
+            # if abs(perpendicular_dist_from_wall) <= PERPENDICULAR_DIST_THRESHOLD and 0 <= distance_from_wall_start <= wall[6]:
+            #     if wall[3] == 90 or wall[3] == 270: # wall direction vertical
+            #         matrix_A.append([-y1, 1, 0])
+            #         matrix_B.append([wall[0][0] - x1])
+
+            #     elif wall[3] == 0 or wall[3] == 180: # wall direction horizontal
+            #         matrix_A.append([x1, 0, 1])
+            #         matrix_B.append([wall[0][1] - y1])
+
+            #     break 
+
+            # New - Found match
             if abs(perpendicular_dist_from_wall) <= PERPENDICULAR_DIST_THRESHOLD and 0 <= distance_from_wall_start <= wall[6]:
-                if wall[3] == 90 or wall[3] == 270: # wall direction vertical
-                    matrix_A.append([-y1, 1, 0])
-                    matrix_B.append([wall[0][0] - x1])
+                matched_walls.append([wall, abs(perpendicular_dist_from_wall)])
 
-                elif wall[3] == 0 or wall[3] == 180: # wall direction horizontal
-                    matrix_A.append([x1, 0, 1])
-                    matrix_B.append([wall[0][1] - y1])
+        if matched_walls == []:
+            continue
 
-                break 
+        closest_wall = min(matched_walls, key=lambda x: x[1])
+        closest_wall = closest_wall[0]
 
+        if closest_wall[3] == 90 or closest_wall[3] == 270: # wall direction vertical
+            matrix_A.append([-y1, 1, 0])
+            matrix_B.append([closest_wall[0][0] - x1])
+
+        elif closest_wall[3] == 0 or closest_wall[3] == 180: # wall direction horizontal
+            matrix_A.append([x1, 0, 1])
+            matrix_B.append([closest_wall[0][1] - y1])
 
     # print('matrix_A: ', matrix_A)
     # print('matrix_B: ', matrix_B)
@@ -130,11 +174,11 @@ def localise(odometry_pose, sensor_readings):
 
     return point_cloud_pose
 
-def localise_iter(odometry_pose, sensor_readings, iter=2):
+def localise_iter(odometry_pose, sensor_readings, mode, iter=2):
     curr_iter = 0 
     curr_init_pose = odometry_pose
     while curr_iter < iter:
-        curr_init_pose = localise(curr_init_pose, sensor_readings)
+        curr_init_pose = localise(curr_init_pose, sensor_readings, mode)
         curr_iter += 1
     
     return curr_init_pose 

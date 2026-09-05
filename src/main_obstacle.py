@@ -17,6 +17,7 @@ from obstacles import cw_obstacle_positions, ccw_obstacle_positions
 USE_TELEMETRY = False
 SPEED = 250 
 PATHS_LIMIT = 3  # full run is 37
+MODE = "obstacle"
 
 devices = initialise_hardware.init()
 nav = navigation.Navigation(devices)
@@ -183,7 +184,7 @@ while True:
 
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    localised_pose = localisation.localise(odometry_pose, sensor_readings)
+    localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
         print("localised pose: ", pose)
