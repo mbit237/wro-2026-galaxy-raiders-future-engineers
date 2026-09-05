@@ -19,7 +19,7 @@ class CoinD4: # standard convention to start classes with uppercase
         self.buf = bytearray(FRAME_LENGTH)
         self.ptr = 0
         self.speed = 0
-        self.measurements = []
+        self.measurements = [[], []]
         self.sample_count = 0
         self.measurement_ptr = 0
         self._prev_start_angle = 0
@@ -35,6 +35,7 @@ class CoinD4: # standard convention to start classes with uppercase
 
 
     def update(self):
+        complete_read = False
         while self.uart.in_waiting > 0:
             chars = self.uart.read(100)
 
@@ -62,15 +63,16 @@ class CoinD4: # standard convention to start classes with uppercase
                     elif self.ptr == HEADER_LENGTH + self.sample_count * 3:
                         self.ptr = 0
                         if self._checksum_correct():
-                            return self._parse_frame()
-        return False
+                            if self._parse_frame():
+                                complete_read = True # all frames 
+        return complete_read
 
     def flush(self):
         while self.uart.in_waiting > 0:
             chars = self.uart.read(100)
         # while self.update():
         #     pass
-        self.measurements = []
+        self.measurements = [[], []]
 
     def _send_cmd(self, code):
         cmd = bytearray(4)
@@ -92,7 +94,7 @@ class CoinD4: # standard convention to start classes with uppercase
         self._send_cmd(0xF5)
 
     def get_measurements(self):
-        return self.measurements
+        return self.measurements[self.measurement_ptr]
 
     def get_rpm(self):
         return self.speed * 60
@@ -104,8 +106,10 @@ class CoinD4: # standard convention to start classes with uppercase
         if self.buf[2] & 1:
             self.speed = (self.buf[2] >> 1) / 10
 
+        # one frame has been filled
         if start_angle < self._prev_start_angle and self.integer == False:
-            self.measurements = []
+            self.measurement_ptr = 1 - self.measurement_ptr
+            self.measurements[self.measurement_ptr] = []
         self._prev_start_angle = start_angle
 
         if self.sample_count > 1:
@@ -124,7 +128,7 @@ class CoinD4: # standard convention to start classes with uppercase
                 self.measurements[round(angle) % 360] = distance
             else:
                 if distance > 0:
-                    self.measurements.append([angle, distance]) # distance is in millimeters 
+                    self.measurements[self.measurement_ptr].append([angle, distance]) # distance is in millimeters 
                 # if self.strength:
                 #     self.measurements[self.measurement_ptr][2] = self.buf[start_index+2] >> 2 | (0x03 & self.buf[start_index+1]) << 6
 
@@ -152,7 +156,7 @@ class CoinD4: # standard convention to start classes with uppercase
     def get_distance(self, dir):
         while True: 
             if self.update():
-                dist = extract_distance(self.measurements, dir)
+                dist = extract_distance(self.measurements[self.measurement_ptr], dir)
                 if dist:
                     return dist
                 

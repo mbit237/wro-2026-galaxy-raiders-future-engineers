@@ -16,7 +16,13 @@ open_walls = [
     [[1000, 1000], [1000, 2000]], 
     [[1000, 2000], [2000, 2000]], 
     [[2000, 2000], [2000, 1000]], 
-    [[2000, 1000], [1000, 1000]]
+    [[2000, 1000], [1000, 1000]],
+
+    # inner walls, extended 
+    [[800, 800], [800, 2200]], 
+    [[800, 2200], [2200, 2200]], 
+    [[2200, 2200], [2200, 800]], 
+    [[2200, 800], [800, 800]]
 ]
 
 obstacle_walls = [
@@ -34,7 +40,7 @@ obstacle_walls = [
 
     # parking walls
     [[0, 1000], [200, 1000]], 
-    [[0, 1277], [200, 1277]], # length robot - 18.5cm x 1.5 = 27.75
+    [[0, 1277], [200, 1277]] # length robot - 18.5cm x 1.5 = 27.75
 ]
 
 def augment_wall(wall):
@@ -114,10 +120,10 @@ def localise(odometry_pose, sensor_readings, mode):
     for c_lidar_reading in c_lidar_readings:
         matched_walls = []
 
-        for wall in walls:
-            x1 = c_lidar_reading[0]
-            y1 = c_lidar_reading[1]
+        x1 = c_lidar_reading[0]
+        y1 = c_lidar_reading[1]
 
+        for wall in walls:
             lidar_reading_from_wall_start_vec = [c_lidar_reading[0] - wall[0][0], c_lidar_reading[1] - wall[0][1]]
             perpendicular_dist_from_wall = dot(wall[5], lidar_reading_from_wall_start_vec) # p_unit_vec * vec_start_from_lidar_point
             distance_from_wall_start = dot(wall[4], lidar_reading_from_wall_start_vec)
@@ -172,8 +178,8 @@ def localise(odometry_pose, sensor_readings, mode):
     point_cloud_pose = calc_pose(Tx, Ty, theta, odometry_pose)
     # print('point cloud', point_cloud_pose)
 
-    if abs(point_cloud_pose[2] - odometry_pose[2]) > 9:
-        print(c_lidar_readings)
+    # if abs(point_cloud_pose[2] - odometry_pose[2]) > 9:
+    #     print(c_lidar_readings)
 
     return point_cloud_pose
 
@@ -182,6 +188,8 @@ def localise_iter(odometry_pose, sensor_readings, mode, iter=2):
     curr_init_pose = odometry_pose
     while curr_iter < iter:
         curr_init_pose = localise(curr_init_pose, sensor_readings, mode)
+        if curr_init_pose is None:
+            break
         curr_iter += 1
     
     return curr_init_pose 
