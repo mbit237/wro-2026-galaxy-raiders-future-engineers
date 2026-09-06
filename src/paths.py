@@ -29,6 +29,8 @@ ccw_obstacle_first_inner_paths = [
     [[3000, 1850], [2400, 1850]],
 ]
 
+cw_parking_path = [[375, 1350], [375, 2000]]
+ccw_parking_path = [[2600, 1600], [2600, 2200]]
 
 # Open
 cw_paths = [ 
