@@ -151,7 +151,7 @@ def localise_once(odometry_pose, sensor_readings, mode):
         closest_wall = min(matched_walls, key=lambda x: x[1])
         closest_wall = closest_wall[0]
 
-        if closest_wall[3] == 90 or closest_wall[3] == 270: # wall direction vertical
+        if closest_wall[3] == 90 or closest_wall[3] == -90: # wall direction vertical
             matrix_A.append([-y1, 1, 0])
             matrix_B.append([closest_wall[0][0] - x1])
 
