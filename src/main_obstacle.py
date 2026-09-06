@@ -5,7 +5,7 @@ import initialise_pose as initialise_pose
 import telemetry_client as telemetry_client
 import sensors as sensors
 import odometry as odometry
-import spike_localisation as localisation
+import point_cloud_localisation as localisation
 import complementary_filter as complementary_filter
 import navigation as navigation
 import rpicam as rpicam
@@ -16,7 +16,7 @@ from obstacles import cw_obstacle_positions, ccw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
-PATHS_LIMIT = 3  # full run is 37
+PATHS_LIMIT = 17  # full run is 37
 MODE = "obstacle"
 
 devices = initialise_hardware.init()
@@ -131,7 +131,37 @@ while True:
         break
 print('exit 2')
 
-# # get out of parking: forward2
+# move a bit more so that bot wont brush parking wall
+starting_paths[0][2] -= 40
+while True:
+    sensor_readings = sensors.read(devices)
+    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    pose = odometry_pose
+
+    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+    devices["camera_servo"].set_dir(dir_to_obstacle)
+
+#    print(pose)
+    if nav.drive_path(starting_paths[0], pose, 200, debug=False):
+        break
+print('exit 3')
+
+stop_time = time.time() + 0.35
+while True:
+    sensor_readings = sensors.read(devices)
+    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    pose = odometry_pose
+
+    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+    devices["camera_servo"].set_dir(dir_to_obstacle)
+
+#    print(pose)
+    nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
+    if time.time() > stop_time:
+        break
+print('exit 4')
+
+# get out of parking: forward2
 while True:
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
@@ -143,7 +173,7 @@ while True:
 #    print(pose)
     if nav.drive_path(starting_paths[2], pose, 200, debug=False):
         break
-print('exit 3')
+print('exit 5')
 
 print('obs', pose, obstacle_positions[-1])
 
@@ -159,7 +189,7 @@ elif color == "g":
     starting_paths = outer_starting_paths
     paths = green_paths
 
-# # get out of parking: forward3 (run a bit more if neccessary)
+# get out of parking: forward3 (run a bit more if neccessary)
 while True:
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
@@ -171,7 +201,7 @@ while True:
 #    print(pose)
     if nav.drive_path(starting_paths[2], pose, 200, debug=False):
         break
-print('exit 4')
+print('exit 6')
 
 while True:
     # debugging prints
@@ -187,7 +217,7 @@ while True:
     localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
-        print("localised pose: ", pose)
+        print("localised pose: ", odometry_pose, localised_pose, pose)
     else:
         pose = odometry_pose
     
@@ -221,3 +251,19 @@ while True:
             print('path changed n', path_idx)
 
 nav.stop()
+time.sleep(2)
+# Post run debugging
+localisation_count = 0
+while True:
+    sensor_readings = sensors.read(devices)
+    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
+    if localised_pose: 
+        localisation_count += 1
+        pose = complementary_filter.merge(odometry_pose, localised_pose)
+        print("localised pose: ", odometry_pose, localised_pose, pose)
+    else:
+        pose = odometry_pose
+
+    if localisation_count == 10:
+        break

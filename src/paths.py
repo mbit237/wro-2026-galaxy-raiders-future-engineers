@@ -43,23 +43,23 @@ ccw_paths = [
 
 outer_one_section = [
     # straight path #1
-    [[250, 1000], [250, 1500]],
+    [[200, 1000], [200, 1500]],
 
-    [[250, 1500], [250, 2000]],
+    [[200, 1500], [200, 2150]],
 
-    [[250, 2000], [600, 2750]],
+    [[200, 2150], [600, 2700]],
 
-    [[800, 2750], [1000, 2750]]
+    [[800, 2700], [1000, 2750]]
 ]
 
 inner_one_section = [
-    [[750, 1000], [750, 1500]],
+    [[800, 1000], [800, 1500]],
 
-    [[750, 1500], [750, 2000]], 
+    [[800, 1500], [800, 2000]], 
 
-    [[750, 2100], [750, 2200]],
+    [[800, 2000], [800, 2100]],
 
-    [[750, 2250], [1000, 2250]]
+    [[800, 2200], [1000, 2200]]
 ]
 
 # Old paths
@@ -165,6 +165,7 @@ ccw_paths = augment_paths(ccw_paths)
 
 # Obstacle
 cw_obstacle_outer_paths, cw_obstacle_inner_paths = full_path_from_one_section(outer_one_section, inner_one_section)
+cw_obstacle_outer_paths[0][0][0], cw_obstacle_outer_paths[0][1][0] = 400, 400
 ccw_obstacle_outer_paths, ccw_obstacle_inner_paths = ccw_paths_from_cw(cw_obstacle_outer_paths, cw_obstacle_inner_paths)
 
 cw_obstacle_outer_paths = augment_paths(cw_obstacle_outer_paths)

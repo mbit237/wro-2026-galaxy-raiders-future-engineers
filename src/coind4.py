@@ -68,10 +68,16 @@ class CoinD4: # standard convention to start classes with uppercase
         return complete_read
 
     def flush(self):
+        self.uart.reset_input_buffer()
         while self.uart.in_waiting > 0:
             chars = self.uart.read(100)
         # while self.update():
         #     pass
+        self.buf = bytearray(FRAME_LENGTH)
+        self.ptr = 0
+        self.sample_count = 0
+        self.measurement_ptr = 0
+        self._prev_start_angle = 0
         self.measurements = [[], []]
 
     def _send_cmd(self, code):
