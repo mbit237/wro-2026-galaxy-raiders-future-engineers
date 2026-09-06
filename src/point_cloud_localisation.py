@@ -3,7 +3,7 @@ import numpy as np
 
 from utilities import dot
 
-PERPENDICULAR_DIST_THRESHOLD = 100
+PERPENDICULAR_DIST_THRESHOLD = 200
 MINIMUN_POINTS = 50
 
 open_walls = [

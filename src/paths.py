@@ -30,7 +30,7 @@ ccw_obstacle_first_inner_paths = [
 ]
 
 cw_parking_path = [[375, 1350], [375, 2000]]
-ccw_parking_path = [[2600, 1600], [2600, 2200]]
+ccw_parking_path = [[2700, 1600], [2700, 2200]]
 
 # Open
 cw_paths = [ 
@@ -100,9 +100,6 @@ inner_one_section = [
 #     [[850, 2200], [1000, 2200]], # [[850, 2200], [900, 2200]],
 #     # check colour
 # ]
-
-cw_parking_path = [[335, 1350], [335, 2000]]
-ccw_parking_path = [[2400, 1600], [2900, 1800]]
 
 def augment_path(path):
     dx = path[1][0] - path[0][0]
@@ -193,4 +190,3 @@ ccw_obstacle_inner_paths = augment_paths(ccw_obstacle_inner_paths)
 ccw_parking_path = augment_path(ccw_parking_path)
 ccw_obstacle_first_inner_paths = augment_paths(ccw_obstacle_first_inner_paths)
 ccw_obstacle_first_outer_paths = augment_paths(ccw_obstacle_first_outer_paths)
-
