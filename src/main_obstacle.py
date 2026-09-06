@@ -103,78 +103,151 @@ next_print = time.time() + print_period
 
 # get out of parking: forward
 starting_paths = outer_starting_paths
-while True:
-    sensor_readings = sensors.read(devices)
-    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    pose = odometry_pose
+if pose[0] < 1500:
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
 
-    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-    devices["camera_servo"].set_dir(dir_to_obstacle)
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
 
-    if nav.drive_path(starting_paths[0], pose, 200, debug=False):
-        break
-print('exit 1')
+        if nav.drive_path(starting_paths[0], pose, 200, debug=False):
+            break
+    print('exit 1')
 
-# # get out of parking: back
-stop_time = time.time() + 0.35
-while True:
-    sensor_readings = sensors.read(devices)
-    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    pose = odometry_pose
+    # # get out of parking: back
+    stop_time = time.time() + 0.35
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
 
-    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-    devices["camera_servo"].set_dir(dir_to_obstacle)
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
 
-#    print(pose)
-    nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
-    if time.time() > stop_time:
-        break
-print('exit 2')
+    #    print(pose)
+        nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
+        if time.time() > stop_time:
+            break
+    print('exit 2')
 
-# move a bit more so that bot wont brush parking wall
-starting_paths[0][2] -= 40
-while True:
-    sensor_readings = sensors.read(devices)
-    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    pose = odometry_pose
+    # move a bit more so that bot wont brush parking wall
+    starting_paths[0][2] -= 40
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
 
-    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-    devices["camera_servo"].set_dir(dir_to_obstacle)
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
 
-#    print(pose)
-    if nav.drive_path(starting_paths[0], pose, 200, debug=False):
-        break
-print('exit 3')
+    #    print(pose)
+        if nav.drive_path(starting_paths[0], pose, 200, debug=False):
+            break
+    print('exit 3')
 
-stop_time = time.time() + 0.35
-while True:
-    sensor_readings = sensors.read(devices)
-    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    pose = odometry_pose
+    stop_time = time.time() + 0.35
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
 
-    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-    devices["camera_servo"].set_dir(dir_to_obstacle)
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
 
-#    print(pose)
-    nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
-    if time.time() > stop_time:
-        break
-print('exit 4')
+    #    print(pose)
+        nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
+        if time.time() > stop_time:
+            break
+    print('exit 4')
 
-# get out of parking: forward2
-while True:
-    sensor_readings = sensors.read(devices)
-    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    pose = odometry_pose
+    # get out of parking: forward2
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
 
-    dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-    devices["camera_servo"].set_dir(dir_to_obstacle)
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
 
-#    print(pose)
-    if nav.drive_path(starting_paths[2], pose, 200, debug=False):
-        break
-print('exit 5')
+    #    print(pose)
+        if nav.drive_path(starting_paths[2], pose, 200, debug=False):
+            break
+    print('exit 5')
 
+elif pose[0] > 1500:
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
+
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
+
+        if nav.drive_path(starting_paths[0], pose, 200, debug=False):
+            break
+    print('exit 1')
+
+    # # get out of parking: back
+    stop_time = time.time() + 0.35
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
+
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
+
+    #    print(pose)
+        nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
+        if time.time() > stop_time:
+            break
+    print('exit 2')
+
+    # move a bit more so that bot wont brush parking wall
+    starting_paths[0][2] -= 40
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
+
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
+
+    #    print(pose)
+        if nav.drive_path(starting_paths[0], pose, 200, debug=False):
+            break
+    print('exit 3')
+
+    stop_time = time.time() + 0.35
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
+
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
+
+    #    print(pose)
+        nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
+        if time.time() > stop_time:
+            break
+    print('exit 4')
+
+    # get out of parking: forward2
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        pose = odometry_pose
+
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
+
+    #    print(pose)
+        if nav.drive_path(starting_paths[2], pose, 200, debug=False):
+            break
+    print('exit 5')
 print('obs', pose, obstacle_positions[-1])
 
 color = cam.detect_blob()
