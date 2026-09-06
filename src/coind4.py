@@ -94,7 +94,7 @@ class CoinD4: # standard convention to start classes with uppercase
         self._send_cmd(0xF5)
 
     def get_measurements(self):
-        return self.measurements[self.measurement_ptr]
+        return self.measurements[1 - self.measurement_ptr]
 
     def get_rpm(self):
         return self.speed * 60
