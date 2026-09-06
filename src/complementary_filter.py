@@ -1,7 +1,7 @@
 POSITION_FILTER_RATIO = 0.1
-HEADING_FILTER_RATIO = 0.05
-# point cloud - 0.5
-# spike - 0.01
+HEADING_FILTER_RATIO = 0.1
+# point cloud 
+# spike
 
 def merge(odo_pose, localised_pose):
     odo_x = odo_pose[0]

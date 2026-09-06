@@ -17,7 +17,7 @@ from obstacles import cw_obstacle_positions, ccw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
-PATHS_LIMIT = 17  # full run is 37
+PATHS_LIMIT = 32  # full run is 49, 16 per round
 MODE = "obstacle"
 
 devices = initialise_hardware.init()
@@ -177,6 +177,17 @@ if pose[0] < 1500:
             break
     print('exit 5')
 
+    color = cam.detect_blob()
+    print(color)
+    if color == "r":
+        print("red")
+        starting_paths = inner_starting_paths
+        paths = red_paths
+    else:
+        print("green")
+        starting_paths = outer_starting_paths
+        paths = green_paths
+
 elif pose[0] > 1500:
     while True:
         sensor_readings = sensors.read(devices)
@@ -249,19 +260,21 @@ elif pose[0] > 1500:
         if nav.drive_path(starting_paths[2], pose, 200, debug=False):
             break
     print('exit 5')
+
+    color = cam.detect_blob()
+    print(color)
+    if color == "r":
+        print("red")
+        starting_paths = outer_starting_paths
+        paths = red_paths
+    else:
+        print("green")
+        starting_paths = inner_starting_paths
+        paths = green_paths
+
 print('obs', pose, obstacle_positions[-1])
 
-color = cam.detect_blob()
-print(color)
-if color == "r":
-    print("red")
-    starting_paths = inner_starting_paths
-    paths = red_paths
-elif color == "g":
-# else:
-    print("green")
-    starting_paths = outer_starting_paths
-    paths = green_paths
+
 
 # get out of parking: forward3 (run a bit more if neccessary)
 while True:

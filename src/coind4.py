@@ -162,7 +162,7 @@ class CoinD4: # standard convention to start classes with uppercase
     def get_distance(self, dir):
         while True: 
             if self.update():
-                dist = extract_distance(self.measurements[self.measurement_ptr], dir)
+                dist = extract_distance(self.measurements[1 - self.measurement_ptr], dir)
                 if dist:
                     return dist
                 

@@ -2,7 +2,7 @@ import math
 from utilities import dot
 
 PATH_GAIN = -0.4
-MAX_ANGLE = 35
+MAX_ANGLE = 60
 
 class Navigation:
     def __init__(self, devices):

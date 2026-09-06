@@ -18,15 +18,15 @@ cw_obstacle_first_inner_paths = [
 
 ccw_obstacle_first_outer_paths = [
     # [2900, 1750], [2600, 1850]
-    [[2500, 1750], [2500, 1950]],
+    [[2500, 1750], [2500, 1900]],
     [[3000, 1750], [2500, 1750]],
-    [[3000, 1850], [2700, 1850]],
+    [[3000, 1750], [2700, 1750]],
 ]  
 ccw_obstacle_first_inner_paths = [
     # [2900, 1750], [2400, 1850]
-    [[2500, 1750], [2500, 1950]],
+    [[2500, 1750], [2500, 1900]],
     [[3000, 1750], [2500, 1750]],
-    [[3000, 1850], [2400, 1850]],
+    [[3000, 1750], [2400, 1750]],
 ]
 
 cw_parking_path = [[375, 1350], [375, 2000]]
@@ -55,9 +55,9 @@ outer_one_section = [
 
     [[200, 1500], [200, 2150]],
 
-    [[200, 2150], [600, 2700]],
+    [[200, 2150], [500, 2600]],
 
-    [[800, 2700], [1000, 2750]]
+    [[800, 2700], [900, 2750]]
 ]
 
 inner_one_section = [
@@ -65,9 +65,9 @@ inner_one_section = [
 
     [[800, 1500], [800, 2000]], 
 
-    [[800, 2000], [800, 2100]],
+    [[800, 2000], [800, 2050]],
 
-    [[800, 2200], [1000, 2200]]
+    [[950, 2200], [1000, 2200]]
 ]
 
 # Old paths
@@ -174,7 +174,13 @@ ccw_paths = augment_paths(ccw_paths)
 # Obstacle
 cw_obstacle_outer_paths, cw_obstacle_inner_paths = full_path_from_one_section(outer_one_section, inner_one_section)
 cw_obstacle_outer_paths[0][0][0], cw_obstacle_outer_paths[0][1][0] = 400, 400
+cw_obstacle_outer_paths[1][0][0], cw_obstacle_outer_paths[1][1][0] = 400, 400
+cw_obstacle_outer_paths[-1][0][0] += 100 
+cw_obstacle_outer_paths[-1][1][0] += 200
 ccw_obstacle_outer_paths, ccw_obstacle_inner_paths = ccw_paths_from_cw(cw_obstacle_outer_paths, cw_obstacle_inner_paths)
+
+ccw_obstacle_outer_paths = ccw_obstacle_outer_paths[1:] + ccw_obstacle_outer_paths[:1]
+ccw_obstacle_inner_paths = ccw_obstacle_inner_paths[1:] + ccw_obstacle_inner_paths[:1]
 
 cw_obstacle_outer_paths = augment_paths(cw_obstacle_outer_paths)
 cw_obstacle_inner_paths = augment_paths(cw_obstacle_inner_paths)
@@ -185,8 +191,6 @@ cw_obstacle_first_outer_paths = augment_paths(cw_obstacle_first_outer_paths)
 ccw_obstacle_outer_paths = augment_paths(ccw_obstacle_outer_paths)
 ccw_obstacle_inner_paths = augment_paths(ccw_obstacle_inner_paths)
 ccw_parking_path = augment_path(ccw_parking_path)
-ccw_obstacle_first_inner_paths = augment_path(ccw_obstacle_first_inner_paths)
-ccw_obstacle_first_outer_paths = augment_path(ccw_obstacle_first_outer_paths)
-
-print(cw_obstacle_outer_paths)
+ccw_obstacle_first_inner_paths = augment_paths(ccw_obstacle_first_inner_paths)
+ccw_obstacle_first_outer_paths = augment_paths(ccw_obstacle_first_outer_paths)
 
