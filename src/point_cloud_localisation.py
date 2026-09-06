@@ -188,7 +188,7 @@ def localise(odometry_pose, sensor_readings, mode, iter=2):
     curr_iter = 0 
     curr_init_pose = odometry_pose
     while curr_iter < iter:
-        curr_init_pose = localise(curr_init_pose, sensor_readings, mode)
+        curr_init_pose = localise_once(curr_init_pose, sensor_readings, mode)
         if curr_init_pose is None:
             break
         curr_iter += 1
