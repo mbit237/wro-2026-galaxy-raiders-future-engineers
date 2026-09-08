@@ -1,5 +1,6 @@
 STEER_MAX = 42
 CENTER_US = 1425  # center microseconds
+STEER_GAIN = 2
 
 #GPIO20, GPIO21
 
@@ -24,14 +25,13 @@ class Drive:
         pulse_duration = CENTER_US + (375 / 45) * dir
         self.pi.set_servo_pulsewidth(23, pulse_duration)
 
-    def steer_p(self, dir, curr_angle, speed, debug=False):
+    def steer_p(self, dir, curr_angle, speed, debug=False, gain=STEER_GAIN):
         while curr_angle - dir > 180:
             curr_angle -= 360
         while curr_angle - dir < -180:
             curr_angle += 360
 
         error = curr_angle - dir
-        gain = 2 
         correction = error * gain 
         if debug:
             print('steering', correction)
