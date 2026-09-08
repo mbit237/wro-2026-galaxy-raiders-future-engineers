@@ -39,7 +39,7 @@ def estimate_pose(pose, sensor_readings):
     wheel_pose = [pose[0] - LIDAR_WHEEL_DIST * v1[0], pose[1] - LIDAR_WHEEL_DIST * v1[1], pose[2]]
     # print("Wheel pose:", wheel_pose)
 
-    if theta < 0.001 and theta < -0.001:  # if theta is too small, don't change pose
+    if theta < 0.001 and theta > -0.001:  # if theta is too small, don't change pose
         dx = 0
         dy = dist_travelled
     else:

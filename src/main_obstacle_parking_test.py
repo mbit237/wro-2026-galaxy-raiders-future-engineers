@@ -15,6 +15,25 @@ from utilities import *
 from paths import cw_obstacle_inner_paths, cw_obstacle_outer_paths, ccw_obstacle_inner_paths, ccw_obstacle_outer_paths, cw_parking_path, ccw_parking_path, cw_obstacle_first_inner_paths, cw_obstacle_first_outer_paths, ccw_obstacle_first_inner_paths, ccw_obstacle_first_outer_paths
 from obstacles import cw_obstacle_positions, ccw_obstacle_positions
 
+
+def sleep_with_update(dur, debug=False):
+    global pose
+
+    end_time = time.time() + dur
+    loc = 0
+    while time.time() < end_time:
+        sensor_readings = sensors.read(devices)
+        localised_pose = localisation.localise(pose, sensor_readings, MODE)
+        if localised_pose: 
+            # print(sensor_readings['lidar'])
+            loc += 1
+            pose = localised_pose
+            if debug:
+                print('sleep', odometry_pose, localised_pose)
+
+    if debug:
+        print(pose, loc)
+
 USE_TELEMETRY = False
 SPEED = 250 
 PATHS_LIMIT = 17  # full run is 37
@@ -43,17 +62,8 @@ devices['lidar'].flush()
 # pose = [2565, 1555, 90]
 pose = [2680, 2150, 90]
 
-end_time = time.time() + 0.5
-loc = 0
-while time.time() < end_time:
-    sensor_readings = sensors.read(devices)
-    localised_pose = localisation.localise(pose, sensor_readings, MODE)
-    if localised_pose: 
-        # print(sensor_readings['lidar'])
-        loc += 1
-        pose = localised_pose
-        print(localised_pose)
-print('start pose', pose, loc)
+print("start pose")
+sleep_with_update(0.5)
 
 devices['led'].green_on()
 
@@ -123,10 +133,6 @@ odometry.reset_pose()
 
 nav.stop()
 
-end_time = time.time() + 2
-while time.time() < end_time:
-    sensor_readings = sensors.read(devices)
-
 # Parking 
 devices["drive"].steering(45)
 devices["drive"].drive(-200)
@@ -145,16 +151,9 @@ while pose[1] > move_back_1_stop_y:
 nav.stop()
 print('end pose1: ', pose) 
 
-end_time = time.time() + 1
-loc = False
-while time.time() < end_time:
-    sensor_readings = sensors.read(devices)
-    odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
-    if localised_pose: 
-        loc = True
-        pose = localised_pose
-print('end pose2: ', pose, loc)
+
+print('end pose2: ')
+sleep_with_update(2)
 
 devices["drive"].steering(-45)
 devices["drive"].drive(-200)
@@ -172,9 +171,6 @@ while pose[1] > move_back_1_stop_y:
 
 nav.stop()
 print('end pose3: ', pose) 
-# devices["drive"].drive(0)
-# devices["drive"].steering(-45)
-# time.sleep(0.5)
 
 # move_back_2_stop_y = 1870
 
@@ -188,6 +184,3 @@ print('end pose3: ', pose)
 #         print("localised pose: ", odometry_pose, localised_pose, pose)
 #     else:
 #         pose = odometry_pose
-
-
-nav.stop()
