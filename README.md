@@ -4,7 +4,7 @@
 
 - [Team](#Team)
 
-- [Game Rules](#2026 WRO Future Engineers Game Rules)
+- [Game Rules](#2026-WRO-Future-Engineers-Game-Rules)
 
 - [Hardware documentation](schemes/README.md)
 
