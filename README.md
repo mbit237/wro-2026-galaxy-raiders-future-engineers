@@ -22,4 +22,4 @@
 
 ## 2026 WRO Future Engineers Game Rules
 
-Details of the rules and challenge can be found at this link: 2026 WRO Future Engineers Game Rules
+Details of the rules and challenge can be found at this link: [2026 WRO Future Engineers Game Rules](https://wro-association.org/wp-content/uploads/WRO-2026-Future-Engineers-Self-Driving-Cars-General-Rules.pdf)
