@@ -4,7 +4,7 @@
 
 - [Team](#Team)
 
-- [Challenge](#Challege)
+- [Game Rules](#2026 WRO Future Engineers Game Rules)
 
 - [Hardware documentation](schemes/README.md)
 
@@ -16,8 +16,10 @@
 
 ## Team 
 
-(to be filled)
+- Henry
+- Xin Yu
+- Joshua
 
-## Challenge
+## 2026 WRO Future Engineers Game Rules
 
-(to be filled)
+Details of the rules and challenge can be found at this link: 2026 WRO Future Engineers Game Rules
