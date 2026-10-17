@@ -94,6 +94,22 @@ def confirm_pose(pose, sensor_readings):
     
     return pose
 
+def open_check_wall_extended(devices, direction):
+    wall_extended = True
+    
+    if direction == "right":
+        right_dist = devices["lidar"].get_distance(270)
+        print('Check if wall on right', right_dist)
+        if right_dist > 800:
+            wall_extended = False 
+    else:
+        left_dist = devices["lidar"].get_distance(90)
+        print('Check if wall on left', left_dist)
+        if left_dist > 800:
+            wall_extended = False
+
+    print('Wall extended: ', wall_extended)
+    return wall_extended
     # If none of the conditions are satisfied, rerun the extract distances
 
 # Challenges

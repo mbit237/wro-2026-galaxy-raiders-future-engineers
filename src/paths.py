@@ -33,18 +33,32 @@ cw_parking_path = [[300, 1350], [300, 1500]]
 ccw_parking_path = [[2700, 1600], [2700, 2200]]
 
 # Open
-cw_paths = [ 
+cw_open_outer_paths = [ 
     [[300, 300], [300, 2350]],
     [[300, 2700], [2350, 2700]],
     [[2700, 2700], [2700, 650]],
     [[2700, 300], [650, 300]]
 ]
 
-ccw_paths = [ 
+cw_open_inner_paths = [ 
+    [[800, 800], [800, 2200]],
+    [[800, 2200], [2200, 2200]],
+    [[2200, 2200], [2200, 800]],
+    [[2200, 800], [800, 800]]
+]
+
+ccw_open_outer_paths = [ 
     [[2700, 300], [2700, 2350]],
     [[2700, 2700], [650, 2700]],
     [[300, 2700], [300, 650]],
     [[300, 300], [2350, 300]]
+]
+
+ccw_open_inner_paths = [ 
+    [[2200, 800], [2200, 2200]],
+    [[2200, 2200], [800, 2200]],
+    [[800, 2200], [800, 800]],
+    [[800, 800], [2200, 800]]
 ]
 
 # Obstacle
@@ -165,8 +179,10 @@ def ccw_paths_from_cw(obstacle_outer_paths, obstacle_inner_paths):
 # Open
 open_first_path = augment_path(open_first_path)
 
-cw_paths = augment_paths(cw_paths)
-ccw_paths = augment_paths(ccw_paths)
+cw_open_inner_paths = augment_paths(cw_open_inner_paths)
+ccw_open_inner_paths = augment_paths(ccw_open_inner_paths)
+cw_open_outer_paths = augment_paths(cw_open_outer_paths)
+ccw_open_outer_paths = augment_paths(ccw_open_outer_paths)
 
 # Obstacle
 cw_obstacle_outer_paths, cw_obstacle_inner_paths = full_path_from_one_section(outer_one_section, inner_one_section)

@@ -9,7 +9,7 @@ import point_cloud_localisation as localisation
 import complementary_filter as complementary_filter
 import navigation as navigation
 import led as led
-from paths import open_first_path, cw_paths, ccw_paths
+from paths import open_first_path, cw_open_outer_paths, ccw_open_outer_paths, cw_open_inner_paths, ccw_open_inner_paths
 
 USE_TELEMETRY = False
 SPEED = 250 
@@ -88,10 +88,14 @@ while True:
 
 paths = []
 if pose[0] < 1500:
-    paths = cw_paths
+    paths = cw_open_outer_paths
+    inner_paths = cw_open_inner_paths
+    check_wall_dir = "right"
     print('cw')
 else:
-    paths = ccw_paths
+    paths = ccw_open_outer_paths
+    inner_paths = ccw_open_inner_paths
+    check_wall_dir = "left"
     print('ccw')
 path_idx = 1 # skip first path
 
@@ -110,11 +114,15 @@ while True:
         #     break
     else:
         pose = odometry_pose
-        
-    
+
     path_changed, path_idx = nav.drive_paths(path_idx, paths, pose, SPEED)
     if path_changed:
         print('path_changed: ', path_idx)
+        if not initialise_pose.open_check_wall_extended(devices, check_wall_dir):
+            print(f'changed paths list at idx, {path_idx}')
+            paths[path_idx % 4] = inner_paths[path_idx % 4]
+        print('paths list: ', paths, path_idx)
+
     if path_idx >= PATHS_LIMIT:
         if segment == 'bottom' and pose[1] >= STOPPING_BOTTOM_POS:
             break
