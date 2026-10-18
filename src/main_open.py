@@ -13,7 +13,7 @@ from paths import open_first_path, cw_open_outer_paths, ccw_open_outer_paths, cw
 
 USE_TELEMETRY = False
 SPEED = 250 
-PATHS_LIMIT = 4
+PATHS_LIMIT = 8
 SEGMENT_DIVIDER = 1700
 STOPPING_TOP_POS = 1800
 STOPPING_BOTTOM_POS = 1300
@@ -53,8 +53,10 @@ segment = 'top'
 if pose[1] < SEGMENT_DIVIDER:
     segment = 'bottom'
 
+path_idx = 1 # skip first path
 # --------------- First path --------------- # 
 odometry.reset_pose()
+first_wall_extended = False
 while True:
     sensor_readings = sensors.read(devices)
     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
@@ -97,7 +99,11 @@ else:
     inner_paths = ccw_open_inner_paths
     check_wall_dir = "left"
     print('ccw')
-path_idx = 1 # skip first path
+
+if not initialise_pose.open_check_wall_extended(devices, check_wall_dir):
+    print('first wall extended')
+    path_idx += 1
+    paths[path_idx % 8] = inner_paths[path_idx % 8]
 
 print('After first path: ', pose)
 
@@ -109,7 +115,7 @@ while True:
     localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
     if localised_pose: 
         pose = complementary_filter.merge(odometry_pose, localised_pose)
-        print('Localised pose: ', pose)
+        # print('Localised pose: ', pose)
         # if abs(localised_pose[2] - odometry_pose[2]) > 9:
         #     break
     else:
@@ -118,10 +124,11 @@ while True:
     path_changed, path_idx = nav.drive_paths(path_idx, paths, pose, SPEED)
     if path_changed:
         print('path_changed: ', path_idx)
-        if not initialise_pose.open_check_wall_extended(devices, check_wall_dir):
-            print(f'changed paths list at idx, {path_idx}')
-            paths[path_idx % 4] = inner_paths[path_idx % 4]
-        print('paths list: ', paths, path_idx)
+        # path idx turns to odd and wall not extended
+        if (path_idx % 2 == 1) and not initialise_pose.open_check_wall_extended(devices, check_wall_dir):
+            path_idx += 1 
+            paths[path_idx % 8] = inner_paths[path_idx % 8]
+        print('running which path: ', paths[path_idx % 8][:2])
 
     if path_idx >= PATHS_LIMIT:
         if segment == 'bottom' and pose[1] >= STOPPING_BOTTOM_POS:
