@@ -6,6 +6,8 @@
 
 - [Game Rules](#2026-WRO-Future-Engineers-Game-Rules)
 
+- [Engineering Journal](https://github.com/mbit237/wro-2026-galaxy-raiders-future-engineers/blob/main/engineering-journal/FutureEngineersNotebook.pdf)
+
 - [Hardware documentation](schemes/README.md)
 
 - [Software documentation](src/README.md)
