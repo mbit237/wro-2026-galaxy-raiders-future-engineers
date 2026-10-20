@@ -1,4 +1,7 @@
 # Videos 
 
-Open Challenge (only 2 rounds): https://youtu.be/N8IWccaydcI 
-Obstacle Challenge (unsuccessful round): https://youtu.be/19cARvTU5YQ 
+### Videos of our Open and Obstacle runs during the WRO Singapore Nationals can be found in the below links:
+
+Open Challenge: https://youtu.be/Ur92v_ZuWEA
+
+Obstacle Challenge: https://youtu.be/glFkdRSBrIg
