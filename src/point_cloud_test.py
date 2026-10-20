@@ -7,7 +7,7 @@ lidar_readings = [[360, 450.03142218069206], [359, 448.67661554748315], [358, 44
 
 
 sensor_readings = {"lidar": lidar_readings}
-curr_pose = [2500, 2500, 12]
+curr_pose = [2300, 2800, 12]
 
 # point_cloud_pose = localise(fake_pose, sensor_readings)
 # print(f"actual pose: {actual_pose}, point_cloud_pose: {point_cloud_pose}")
@@ -15,8 +15,10 @@ curr_pose = [2500, 2500, 12]
 # print(f"actual pose: {actual_pose}, point_cloud_pose: {point_cloud_pose}")
 
 start_time = time.perf_counter()
-for x in range(1): 
-    point_cloud_pose_iter = localise(curr_pose, sensor_readings, "open")
+point_cloud_pose_iter = curr_pose
+for x in range(10): 
+    point_cloud_pose_iter = localise(point_cloud_pose_iter, sensor_readings, "open")
+    print(point_cloud_pose_iter)
 
 print(f"actual pose: {actual_pose}, point_cloud_pose: {point_cloud_pose_iter}")
 end_time = time.perf_counter()
