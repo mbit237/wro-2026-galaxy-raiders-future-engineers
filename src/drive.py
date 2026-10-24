@@ -1,4 +1,4 @@
-STEER_MAX = 42
+STEER_MAX = 55
 CENTER_US = 1425  # center microseconds
 STEER_GAIN = 2
 

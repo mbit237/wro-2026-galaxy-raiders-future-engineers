@@ -17,7 +17,8 @@ from obstacles import cw_obstacle_positions, ccw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
-PATHS_LIMIT = 48  # full run is 48, 16 per round
+# PATHS_LIMIT = 48  # full run is 48, 16 per round
+PATHS_LIMIT = 0
 MODE = "obstacle"
 
 def sleep_with_update(dur, debug=False):
@@ -597,7 +598,7 @@ if pose[0] < 1500:
         dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
         devices["camera_servo"].set_dir(dir_to_obstacle)
 
-    #    print(pose)
+        # print(pose)
         nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
         if time.time() > stop_time:
             break
@@ -618,49 +619,51 @@ if pose[0] < 1500:
         dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
         devices["camera_servo"].set_dir(dir_to_obstacle)
 
-    #    print(pose)
+        # print(pose)
         if nav.drive_path(starting_paths[0], pose, 200, debug=False):
             break
     print('exit 3')
 
-    stop_time = time.time() + 0.35
-    while True:
-        sensor_readings = sensors.read(devices)
-        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-        localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
-        if localised_pose: 
-            pose = complementary_filter.merge(odometry_pose, localised_pose)
-            print("localised pose: ", odometry_pose, localised_pose, pose)
-        else:
-            pose = odometry_pose
+    # stop_time = time.time() + 0.35
+    # while True:
+    #     sensor_readings = sensors.read(devices)
+    #     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    #     localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
+    #     if localised_pose: 
+    #         pose = complementary_filter.merge(odometry_pose, localised_pose)
+    #         print("localised pose: ", odometry_pose, localised_pose, pose)
+    #     else:
+    #         pose = odometry_pose
 
-        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-        devices["camera_servo"].set_dir(dir_to_obstacle)
+    #     dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+    #     devices["camera_servo"].set_dir(dir_to_obstacle)
 
-    #    print(pose)
-        nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
-        if time.time() > stop_time:
-            break
-    print('exit 4')
+    # #    print(pose)
+    #     nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
+    #     if time.time() > stop_time:
+    #         break
+    # print('exit 4')
 
     # get out of parking: forward2
-    while True:
-        sensor_readings = sensors.read(devices)
-        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-        localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
-        if localised_pose: 
-            pose = complementary_filter.merge(odometry_pose, localised_pose)
-            print("localised pose: ", odometry_pose, localised_pose, pose)
-        else:
-            pose = odometry_pose
+    # while True:
+    #     sensor_readings = sensors.read(devices)
+    #     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+    #     localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
+    #     if localised_pose: 
+    #         pose = complementary_filter.merge(odometry_pose, localised_pose)
+    #         print("localised pose: ", odometry_pose, localised_pose, pose)
+    #     else:
+    #         pose = odometry_pose
 
-        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-        devices["camera_servo"].set_dir(dir_to_obstacle)
+    #     dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+    #     devices["camera_servo"].set_dir(dir_to_obstacle)
 
-    #    print(pose)
-        if nav.drive_path(starting_paths[2], pose, 200, debug=False):
-            break
-    print('exit 5')
+    # #    print(pose)
+    #     if nav.drive_path(starting_paths[2], pose, 200, debug=False):
+    #         break
+    # print('exit 5')
+
+
 
     color = cam.detect_blob()
     print(color)
