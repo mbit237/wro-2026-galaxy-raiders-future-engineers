@@ -17,8 +17,8 @@ from obstacles import cw_obstacle_positions, ccw_obstacle_positions
 
 USE_TELEMETRY = False
 SPEED = 250 
-# PATHS_LIMIT = 48  # full run is 48, 16 per round
-PATHS_LIMIT = 0
+# PATHS_LIMIT = 16  # full run is 48, 16 per round
+PATHS_LIMIT = 0  # to test parking
 MODE = "obstacle"
 
 def sleep_with_update(dur, debug=False):
@@ -102,10 +102,10 @@ def parking_cw():
     nav.stop()
 
     # Parking 
-    devices["drive"].steering(-45)
+    devices["drive"].steering(-(drive.STEER_MAX))
     devices["drive"].drive(-150)
 
-    move_back_1_stop_y = 1290
+    move_back_1_stop_y = 1260
     while pose[1] > move_back_1_stop_y: 
         sensor_readings = sensors.read(devices)
         odometry_pose = odometry.estimate_pose(pose, sensor_readings)
@@ -141,7 +141,7 @@ def parking_cw():
     devices["drive"].drive(0)
 
     sleep_with_update(0.3)
-    devices["drive"].steering(45)
+    devices["drive"].steering(drive.STEER_MAX)
     sleep_with_update(0.3)
 
     devices["drive"].drive(-100)
@@ -158,7 +158,7 @@ def parking_cw():
 
     print('end pose4: ', pose) 
     devices["drive"].drive(0)
-    # devices["drive"].steering(45)
+    # devices["drive"].steering(drive.STEER_MAX)
     sleep_with_update(0.3)
 
     forward_stop_y = 1200
@@ -220,11 +220,11 @@ def parking_cw():
         print('end pose stage 2-2: ', pose) 
 
         # forward
-        devices["drive"].steering(-45)
+        devices["drive"].steering(-(drive.STEER_MAX))
         sleep_with_update(0.3)
         devices["drive"].drive(75)
 
-        forward_stop_y = 1150
+        forward_stop_y = 1170
         while pose[1] < forward_stop_y: 
             sensor_readings = sensors.read(devices)
             odometry_pose = odometry.estimate_pose(pose, sensor_readings)
@@ -321,7 +321,7 @@ def parking_ccw():
     # Parking stage 2
 
     # Back 1: 45 deg
-    devices["drive"].steering(45)
+    devices["drive"].steering(drive.STEER_MAX)
     devices["drive"].drive(-150)
 
     move_back_1_stop_y = 2015 
@@ -362,7 +362,7 @@ def parking_ccw():
 
     # Back 3: -45 deg
     sleep_with_update(0.3)
-    devices["drive"].steering(-45)
+    devices["drive"].steering(-(drive.STEER_MAX))
     sleep_with_update(0.3)
 
     devices["drive"].drive(-100)
@@ -379,7 +379,7 @@ def parking_ccw():
 
     print('end pose4: ', pose) 
     devices["drive"].drive(0)
-    # devices["drive"].steering(45)
+    # devices["drive"].steering(drive.STEER_MAX)
     sleep_with_update(0.3)
 
     # Forward: straigten to heading 90
@@ -402,7 +402,7 @@ def parking_ccw():
     # Stage 3
     while pose[0] < 2880:
         # Back 1
-        devices["drive"].steering(45)
+        devices["drive"].steering(drive.STEER_MAX)
         sleep_with_update(0.1)
         devices["drive"].drive(-75)
 
@@ -584,7 +584,7 @@ if pose[0] < 1500:
     print('exit 1')
 
     # # get out of parking: back
-    stop_time = time.time() + 0.35
+    stop_time = time.time() + 0.5
     while True:
         sensor_readings = sensors.read(devices)
         odometry_pose = odometry.estimate_pose(pose, sensor_readings)
@@ -624,44 +624,44 @@ if pose[0] < 1500:
             break
     print('exit 3')
 
-    # stop_time = time.time() + 0.35
-    # while True:
-    #     sensor_readings = sensors.read(devices)
-    #     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    #     localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
-    #     if localised_pose: 
-    #         pose = complementary_filter.merge(odometry_pose, localised_pose)
-    #         print("localised pose: ", odometry_pose, localised_pose, pose)
-    #     else:
-    #         pose = odometry_pose
+    stop_time = time.time() + 0.35
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
+        if localised_pose: 
+            pose = complementary_filter.merge(odometry_pose, localised_pose)
+            print("localised pose: ", odometry_pose, localised_pose, pose)
+        else:
+            pose = odometry_pose
 
-    #     dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-    #     devices["camera_servo"].set_dir(dir_to_obstacle)
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
 
-    # #    print(pose)
-    #     nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
-    #     if time.time() > stop_time:
-    #         break
-    # print('exit 4')
+    #    print(pose)
+        nav.drive_path_back(starting_paths[1], pose, 200, debug=False)
+        if time.time() > stop_time:
+            break
+    print('exit 4')
 
     # get out of parking: forward2
-    # while True:
-    #     sensor_readings = sensors.read(devices)
-    #     odometry_pose = odometry.estimate_pose(pose, sensor_readings)
-    #     localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
-    #     if localised_pose: 
-    #         pose = complementary_filter.merge(odometry_pose, localised_pose)
-    #         print("localised pose: ", odometry_pose, localised_pose, pose)
-    #     else:
-    #         pose = odometry_pose
+    while True:
+        sensor_readings = sensors.read(devices)
+        odometry_pose = odometry.estimate_pose(pose, sensor_readings)
+        localised_pose = localisation.localise(odometry_pose, sensor_readings, MODE)
+        if localised_pose: 
+            pose = complementary_filter.merge(odometry_pose, localised_pose)
+            print("localised pose: ", odometry_pose, localised_pose, pose)
+        else:
+            pose = odometry_pose
 
-    #     dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
-    #     devices["camera_servo"].set_dir(dir_to_obstacle)
+        dir_to_obstacle = dir_to_point(pose, obstacle_positions[-1])
+        devices["camera_servo"].set_dir(dir_to_obstacle)
 
-    # #    print(pose)
-    #     if nav.drive_path(starting_paths[2], pose, 200, debug=False):
-    #         break
-    # print('exit 5')
+    #    print(pose)
+        if nav.drive_path(starting_paths[2], pose, 200, debug=False):
+            break
+    print('exit 5')
 
 
 
