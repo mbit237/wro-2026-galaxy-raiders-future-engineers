@@ -36,6 +36,11 @@ params.minInertiaRatio = 0.01
 
 detector = cv2.SimpleBlobDetector_create(params)
 
+# Width-to-height ratio range for the standard 100mm traffic block
+# need to tune
+ORIG_MIN_RATIO = 0.35
+ORIG_MAX_RATIO = 0.85
+
 picam2 = Picamera2() # resolution: 640x480
 picam2.start()
 
@@ -77,11 +82,32 @@ class Rpicam:
         if g_largest_keypoint is None and r_largest_keypoint is None:
             return None
         elif g_largest_keypoint is None:
-            return "r"
+            selected_frame = r_frame
+            colour = "r"
         elif r_largest_keypoint is None:
-            return "g"
+            selected_frame = g_frame
+            colour = "g"
         else:
             if g_largest_keypoint.size > r_largest_keypoint.size:
-                return "g"
+                selected_frame = g_frame
+                colour = "g"
             else:
-                return "r"
+                selected_frame = r_frame
+                colour = "r"
+
+        contours, _ = cv2.findContours(selected_frame, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        if not contours:
+            return None
+
+        largest_contour = max(contours, key=cv2.contourArea)
+        _, _, width, height = cv2.boundingRect(largest_contour)
+        if height == 0:
+            return None
+
+        ratio = width / height
+        if ratio < ORIG_MIN_RATIO or ratio > ORIG_MAX_RATIO:
+            block_type = "modified"
+        else:
+            block_type = "orig"
+
+        return colour, block_type
