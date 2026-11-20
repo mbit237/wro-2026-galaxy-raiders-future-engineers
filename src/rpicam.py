@@ -38,8 +38,8 @@ detector = cv2.SimpleBlobDetector_create(params)
 
 # Width-to-height ratio range for the standard 100mm traffic block
 # need to tune
-ORIG_MIN_RATIO = 0.35
-ORIG_MAX_RATIO = 0.85
+ORIG_MIN_RATIO = 0.60
+ORIG_MAX_RATIO = 0.65
 
 picam2 = Picamera2() # resolution: 640x480
 picam2.start()
