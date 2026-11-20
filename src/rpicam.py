@@ -1,21 +1,25 @@
 import cv2
 from picamera2 import Picamera2
 
-#green threshold
-g_low_H = 44
-g_high_H = 75
-g_low_S = 84
-g_high_S = 255
-g_low_V = 41
-g_high_V = 255
+# Green thresholds
+G_MIN_H = 44
+G_MAX_H = 75
 
-#red threshold
-r_low_H = 112
-r_high_H = 128
-r_low_S = 90
-r_high_S = 255
-r_low_V = 93
-r_high_V = 255
+G_MIN_S = 84
+G_MAX_S = 255
+
+G_MIN_V = 41
+G_MAX_V = 255
+
+# Red thresholds
+R_MIN_H = 112
+R_MAX_H = 128
+
+R_MIN_S = 90
+R_MAX_S = 255
+
+R_MIN_V = 93
+R_MAX_V = 255
 
 params = cv2.SimpleBlobDetector_Params()
 params.filterByColor = True
@@ -32,8 +36,8 @@ params.minInertiaRatio = 0.01
 
 detector = cv2.SimpleBlobDetector_create(params)
 
-picam2 = Picamera2() # default resolution - 640x480
-picam2.start() # Change the number to select a different camera
+picam2 = Picamera2() # resolution: 640x480
+picam2.start()
 
 
 class Rpicam:
@@ -41,14 +45,14 @@ class Rpicam:
         pass
 
     def detect_blob(self):
-        frame = picam2.capture_array("main") # Grab one image frame from camera
+        frame = picam2.capture_array("main")
         if frame is None:
             return None
 
         frame = frame[105:-1,0:-1] # y, x
         frame = cv2.GaussianBlur(frame, (5,5), 0)
         hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-        g_frame = cv2.inRange(hsv_frame, (g_low_H, g_low_S, g_low_V), (g_high_H, g_high_S, g_high_V))
+        g_frame = cv2.inRange(hsv_frame, (G_MIN_H, G_MIN_S, G_MIN_V), (G_MAX_H, G_MAX_S, G_MAX_V))
         keypoints = detector.detect(g_frame) # Detects keypoints. Each keypoint will contain the x,y position, and size.
         largest_size = 0
         g_largest_keypoint = None
@@ -57,7 +61,7 @@ class Rpicam:
                 largest_size = keypoint.size
                 g_largest_keypoint = keypoint
         
-        r_frame = cv2.inRange(hsv_frame, (r_low_H, r_low_S, r_low_V), (r_high_H, r_high_S, r_high_V))
+        r_frame = cv2.inRange(hsv_frame, (R_MIN_H, R_MIN_S, R_MIN_V), (R_MAX_H, R_MAX_S, R_MAX_V))
         keypoints = detector.detect(r_frame) # Detects keypoints. Each keypoint will contain the x,y position, and size.
         largest_size = 0
         r_largest_keypoint = None
