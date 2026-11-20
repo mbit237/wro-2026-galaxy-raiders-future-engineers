@@ -68,7 +68,7 @@ def read_ratio_controls():
 def prepare_frame(frame):
     if frame is None:
         return None
-    frame = frame[105:-1, 0:-1]
+    # frame = frame[105:-1, 0:-1]
     if len(frame.shape) == 3 and frame.shape[2] == 4:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
     return cv2.GaussianBlur(frame, (5, 5), 0)
@@ -83,12 +83,8 @@ def make_colour_mask(hsv_frame, colour):
 
 
 def find_largest_contour(mask, min_area):
-    contours, _ = cv2.findContours(
-        mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE
-    )
-    candidates = [
-        contour for contour in contours if cv2.contourArea(contour) >= min_area
-    ]
+    contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    candidates = [contour for contour in contours if cv2.contourArea(contour) >= min_area]
     return max(candidates, key=cv2.contourArea, default=None)
 
 
@@ -150,7 +146,7 @@ def draw_detection(frame, detections, original_min, original_max):
     return display
 
 
-def main():
+def calibration_loop():
     create_hsv_trackbars()
     create_ratio_trackbars()
 
@@ -191,4 +187,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    calibration_loop()
