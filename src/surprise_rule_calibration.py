@@ -8,7 +8,6 @@ HSV_WINDOW = "HSV Controls"
 RATIO_WINDOW = "Ratio Controls"
 MIN_CONTOUR_AREA = 500
 
-
 def create_hsv_trackbars():
     cv2.namedWindow(HSV_WINDOW)
     defaults = {
@@ -45,8 +44,8 @@ def read_hsv_bounds(colour):
 
 def create_ratio_trackbars():
     cv2.namedWindow(RATIO_WINDOW)
-    cv2.createTrackbar("Original min x100", RATIO_WINDOW, 35, 500, lambda _: None)
-    cv2.createTrackbar("Original max x100", RATIO_WINDOW, 85, 500, lambda _: None)
+    cv2.createTrackbar("Original min x100", RATIO_WINDOW, 60, 500, lambda _: None)
+    cv2.createTrackbar("Original max x100", RATIO_WINDOW, 65, 500, lambda _: None)
     cv2.createTrackbar(
         "Minimum contour area",
         RATIO_WINDOW,
@@ -68,7 +67,7 @@ def read_ratio_controls():
 def prepare_frame(frame):
     if frame is None:
         return None
-    # frame = frame[105:-1, 0:-1]
+    frame = frame[60:-1, 0:-1]
     if len(frame.shape) == 3 and frame.shape[2] == 4:
         frame = cv2.cvtColor(frame, cv2.COLOR_BGRA2BGR)
     return cv2.GaussianBlur(frame, (5, 5), 0)
@@ -79,7 +78,7 @@ def make_colour_mask(hsv_frame, colour):
     mask = cv2.inRange(hsv_frame, low, high)
     kernel = np.ones((5, 5), dtype=np.uint8)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-    return cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+    return cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel), mask
 
 
 def find_largest_contour(mask, min_area):
@@ -100,14 +99,13 @@ def draw_detection(frame, detections, original_min, original_max):
             (255, 255, 255),
             2,
         )
-        return display
+        return display, [0, 0, 0, 0]
 
     colour, contour = max(detections, key=lambda item: cv2.contourArea(item[1]))
+    # print('number of contours:', len(contour))
     x, y, width, height = cv2.boundingRect(contour)
     ratio = width / height if height else 0.0
-    classification = (
-        "original" if original_min <= ratio <= original_max else "modified"
-    )
+    classification = ("original" if original_min <= ratio <= original_max else "modified")
     draw_colour = (0, 255, 0) if colour == "Green" else (0, 0, 255)
 
     cv2.drawContours(display, [contour], -1, draw_colour, 2)
@@ -139,11 +137,11 @@ def draw_detection(frame, detections, original_min, original_max):
         (255, 255, 255),
         2,
     )
-    print(
-        f"{colour}: width={width}px height={height}px "
-        f"ratio={ratio:.3f} -> {classification}"
-    )
-    return display
+    # print(
+    #     f"{colour}: width={width}px height={height}px "
+    #     f"ratio={ratio:.3f} -> {classification}"
+    # )
+    return display, [x, y, width, height]
 
 
 def calibration_loop():
@@ -159,8 +157,8 @@ def calibration_loop():
                 break
 
             hsv_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
-            green_mask = make_colour_mask(hsv_frame, "Green")
-            red_mask = make_colour_mask(hsv_frame, "Red")
+            green_mask, green_mask = make_colour_mask(hsv_frame, "Green")
+            red_mask, red_mask = make_colour_mask(hsv_frame, "Red")
             original_min, original_max, min_area = read_ratio_controls()
 
             detections = []
@@ -171,13 +169,61 @@ def calibration_loop():
             if red_contour is not None:
                 detections.append(("Red", red_contour))
 
-            display = draw_detection(
+            display, bounding_box = draw_detection(
                 frame, detections, original_min, original_max
             )
+            
+            print('bounding box', bounding_box)
+        
             cv2.imshow(WINDOW, display)
             cv2.imshow("Green mask", green_mask)
             cv2.imshow("Red mask", red_mask)
+            
+            if bounding_box[3] != 0:
+                x = bounding_box[0]
+                y = bounding_box[1]
+                width = bounding_box[2]
+                height = bounding_box[3]
 
+                # print('Num of red pixels', np.count_nonzero(red_mask[y:y+height, x:x+width]))
+                num_green = np.count_nonzero(green_mask[y:y+height, x:x+width])
+                # print('Num of green pixels', num_green)
+                # print('Green ratio: ', num_green/(width*height))
+
+                bottom_y = y + height
+                bottom_slice_height = 20 
+                bottom_slice = green_mask[bottom_y-bottom_slice_height:bottom_y, x:x+width]
+                # print(len(bottom_slice[0]))
+                bottom_contour = find_largest_contour(bottom_slice, -1)
+                b_x, b_y, b_width, b_height = cv2.boundingRect(bottom_contour)
+                
+                # print("width: ", b_width)
+
+
+                left_right_slice_width = 10 
+                left_slice = green_mask[y:y+height, x:x+left_right_slice_width]
+                right_slice = green_mask[y:y+height, x+width-left_right_slice_width:x+width]
+                left_contour = find_largest_contour(left_slice, -1)
+                right_contour = find_largest_contour(right_slice, -1)
+                l_x, l_y, l_width, l_height = cv2.boundingRect(left_contour)
+                # print("left_height: ", l_height, height)
+                r_x, r_y, r_width, r_height = cv2.boundingRect(right_contour)
+                # print("right_height: ", r_height, height)
+                
+                print(l_x, l_y, l_width, l_height)
+                print(r_x, r_y, r_width, r_height)
+                
+                height = 0 
+                if l_y > r_y:
+                    print('left')
+                    height = l_height 
+                else:
+                    print('right')
+                    height = r_height
+                print('height', height)
+
+                print('true aspect ratio', b_width/height if height else 0.0)
+    
             key = cv2.waitKey(1) & 0xFF
             if key == ord("q") or key == 27:
                 break
