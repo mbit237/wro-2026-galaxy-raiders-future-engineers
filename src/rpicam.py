@@ -37,8 +37,8 @@ params.minInertiaRatio = 0.01
 
 detector = cv2.SimpleBlobDetector_create(params)
 
-SMALL_BLOCK_RATIO = 0.3
-LARGE_BLOCK_RATIO = 1.0
+LARGE_BLOCK_RATIO = 0.4
+SMALL_BLOCK_RATIO = 1.0
 
 picam2 = Picamera2() # resolution: 640x480
 picam2.start()
@@ -176,7 +176,7 @@ class Rpicam:
         ratio = b_width/height if height else 0.0
         # print('true aspect ratio', ratio)
 
-        if ratio <= SMALL_BLOCK_RATIO or ratio >= LARGE_BLOCK_RATIO:
+        if ratio <= LARGE_BLOCK_RATIO or ratio >= SMALL_BLOCK_RATIO:
             block_type = "modified"
         else:
             block_type = "orig"
